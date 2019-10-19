@@ -14,14 +14,6 @@ all: equalPath doc
 equalPath: $(OBJ) 
 		$(CC) $(CFLAGS) $(OBJ) -o equalPath
 
-build/Lexer.o: parser/Lexer.c parser/Parser.c
-		mkdir -p build
-		$(CC) -c $(CFLAGS) $< -o $@
-
-build/Parser.o: parser/Parser.c parser/Lexer.c
-		mkdir -p build
-		$(CC) -c $(CFLAGS) $< -o $@
-
 parser/Lexer.c:	parser/Lexer.l 
 		flex parser/Lexer.l
 		mv Lexer.c parser/Lexer.c 
@@ -32,6 +24,14 @@ parser/Parser.c:	parser/Parser.y parser/Lexer.c
 		bison parser/Parser.y
 		mv Parser.c parser/Parser.c
 		mv Parser.h parser/Parser.h
+		
+build/Lexer.o: parser/Lexer.c parser/Parser.c
+		mkdir -p build
+		$(CC) -c $(CFLAGS) $< -o $@
+
+build/Parser.o: parser/Parser.c parser/Lexer.c
+		mkdir -p build
+		$(CC) -c $(CFLAGS) $< -o $@
 
 build/%.o:	src/%.c 
 		mkdir -p build

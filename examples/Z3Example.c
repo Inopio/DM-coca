@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "Z3Tools.h"
 
+
 int main(int argc, char* argv[]){
     
     Z3_context ctx = makeContext();

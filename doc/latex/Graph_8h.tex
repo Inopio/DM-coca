@@ -1,0 +1,205 @@
+\hypertarget{Graph_8h}{}\section{include/\+Graph.h File Reference}
+\label{Graph_8h}\index{include/\+Graph.\+h@{include/\+Graph.\+h}}
+
+
+Structure to store a graph statically, and to access to its informations easily. Includes source and target node informations, and supports several of them.  
+
+
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structGraph}{Graph}
+\begin{DoxyCompactList}\small\item\em \+: the graph type. The first four fields are needed to represent a directed graph. The rest depends on needs. Here, the rest represents initial and final states of an automaton. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{Graph_8h_af1b1d5d0c943d780bab64a290e17bf00}{print\+Graph} (\hyperlink{structGraph}{Graph} graph)
+\begin{DoxyCompactList}\small\item\em Displays a graph with a list of nodes and a matrix of edges. \end{DoxyCompactList}\item 
+void \hyperlink{Graph_8h_a86bafd46e31c9c3d109593f7825ad142}{delete\+Graph} (\hyperlink{structGraph}{Graph} graph)
+\begin{DoxyCompactList}\small\item\em Frees all memory occupied by a graph. \end{DoxyCompactList}\item 
+int \hyperlink{Graph_8h_aeafe4b5e0ec38475576f29edba8fec9d}{orderG} (\hyperlink{structGraph}{Graph} graph)
+\begin{DoxyCompactList}\small\item\em Returns the number of nodes of {\ttfamily graph}. \end{DoxyCompactList}\item 
+int \hyperlink{Graph_8h_a94d5181c70abd1e30f5e9123474e9d3e}{sizeG} (\hyperlink{structGraph}{Graph} graph)
+\begin{DoxyCompactList}\small\item\em Returns the number of edges of {\ttfamily graph}. \end{DoxyCompactList}\item 
+bool \hyperlink{Graph_8h_ac5801b9b5a86f99d8518598400eddb3c}{is\+Edge} (\hyperlink{structGraph}{Graph} graph, int source, int target)
+\begin{DoxyCompactList}\small\item\em Tells if ({\ttfamily source}, {\ttfamily target}) is an edge in {\ttfamily graph}. \end{DoxyCompactList}\item 
+bool \hyperlink{Graph_8h_a25d69fd376da4e0c1d777b4749ef92f1}{is\+Source} (\hyperlink{structGraph}{Graph} graph, int node)
+\begin{DoxyCompactList}\small\item\em Tells if {\ttfamily node} is source in {\ttfamily graph}. \end{DoxyCompactList}\item 
+bool \hyperlink{Graph_8h_ae57db020c93bbe292ff74f935bacc0de}{is\+Target} (\hyperlink{structGraph}{Graph} graph, int node)
+\begin{DoxyCompactList}\small\item\em Tells if {\ttfamily node} is target in «graph». \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{Graph_8h_a66631d7172e9bbcb3a13479be85b542d}{get\+Node\+Name} (\hyperlink{structGraph}{Graph} graph, int node)
+\begin{DoxyCompactList}\small\item\em Returns the name of a node given its identifier. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Structure to store a graph statically, and to access to its informations easily. Includes source and target node informations, and supports several of them. 
+
+\begin{DoxyAuthor}{Author}
+Vincent Penelle (\href{mailto:vincent.penelle@u-bordeaux.fr}{\tt vincent.\+penelle@u-\/bordeaux.\+fr}) 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2018-\/11-\/18, 2019-\/07-\/23, 2019-\/08-\/02
+\end{DoxyDate}
+\begin{DoxyCopyright}{Copyright}
+Creative Commons. 
+\end{DoxyCopyright}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{Graph_8h_a86bafd46e31c9c3d109593f7825ad142}\label{Graph_8h_a86bafd46e31c9c3d109593f7825ad142}} 
+\index{Graph.\+h@{Graph.\+h}!delete\+Graph@{delete\+Graph}}
+\index{delete\+Graph@{delete\+Graph}!Graph.\+h@{Graph.\+h}}
+\subsubsection{\texorpdfstring{delete\+Graph()}{deleteGraph()}}
+{\footnotesize\ttfamily void delete\+Graph (\begin{DoxyParamCaption}\item[{\hyperlink{structGraph}{Graph}}]{graph }\end{DoxyParamCaption})}
+
+
+
+Frees all memory occupied by a graph. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em graph} & The graph to delete. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Graph_8h_a66631d7172e9bbcb3a13479be85b542d}\label{Graph_8h_a66631d7172e9bbcb3a13479be85b542d}} 
+\index{Graph.\+h@{Graph.\+h}!get\+Node\+Name@{get\+Node\+Name}}
+\index{get\+Node\+Name@{get\+Node\+Name}!Graph.\+h@{Graph.\+h}}
+\subsubsection{\texorpdfstring{get\+Node\+Name()}{getNodeName()}}
+{\footnotesize\ttfamily char$\ast$ get\+Node\+Name (\begin{DoxyParamCaption}\item[{\hyperlink{structGraph}{Graph}}]{graph,  }\item[{int}]{node }\end{DoxyParamCaption})}
+
+
+
+Returns the name of a node given its identifier. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em graph} & A graph. \\
+\hline
+{\em node} & A node identifier. Must be lower than orderG({\ttfamily graph}). \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+char$\ast$ The name of {\ttfamily node}. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Graph_8h_ac5801b9b5a86f99d8518598400eddb3c}\label{Graph_8h_ac5801b9b5a86f99d8518598400eddb3c}} 
+\index{Graph.\+h@{Graph.\+h}!is\+Edge@{is\+Edge}}
+\index{is\+Edge@{is\+Edge}!Graph.\+h@{Graph.\+h}}
+\subsubsection{\texorpdfstring{is\+Edge()}{isEdge()}}
+{\footnotesize\ttfamily bool is\+Edge (\begin{DoxyParamCaption}\item[{\hyperlink{structGraph}{Graph}}]{graph,  }\item[{int}]{source,  }\item[{int}]{target }\end{DoxyParamCaption})}
+
+
+
+Tells if ({\ttfamily source}, {\ttfamily target}) is an edge in {\ttfamily graph}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em graph} & A graph. \\
+\hline
+{\em source} & The source of the edge. \\
+\hline
+{\em target} & The target of the edge. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true If the edge is present in {\ttfamily graph}. 
+
+false Otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Graph_8h_a25d69fd376da4e0c1d777b4749ef92f1}\label{Graph_8h_a25d69fd376da4e0c1d777b4749ef92f1}} 
+\index{Graph.\+h@{Graph.\+h}!is\+Source@{is\+Source}}
+\index{is\+Source@{is\+Source}!Graph.\+h@{Graph.\+h}}
+\subsubsection{\texorpdfstring{is\+Source()}{isSource()}}
+{\footnotesize\ttfamily bool is\+Source (\begin{DoxyParamCaption}\item[{\hyperlink{structGraph}{Graph}}]{graph,  }\item[{int}]{node }\end{DoxyParamCaption})}
+
+
+
+Tells if {\ttfamily node} is source in {\ttfamily graph}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em graph} & A graph. \\
+\hline
+{\em node} & A node. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true If {\ttfamily node} is a source. 
+
+false Otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Graph_8h_ae57db020c93bbe292ff74f935bacc0de}\label{Graph_8h_ae57db020c93bbe292ff74f935bacc0de}} 
+\index{Graph.\+h@{Graph.\+h}!is\+Target@{is\+Target}}
+\index{is\+Target@{is\+Target}!Graph.\+h@{Graph.\+h}}
+\subsubsection{\texorpdfstring{is\+Target()}{isTarget()}}
+{\footnotesize\ttfamily bool is\+Target (\begin{DoxyParamCaption}\item[{\hyperlink{structGraph}{Graph}}]{graph,  }\item[{int}]{node }\end{DoxyParamCaption})}
+
+
+
+Tells if {\ttfamily node} is target in «graph». 
+
+
+\begin{DoxyParams}{Parameters}
+{\em graph} & A graph. \\
+\hline
+{\em node} & A node. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true If {\ttfamily node} is a target. 
+
+false Otherwise. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Graph_8h_aeafe4b5e0ec38475576f29edba8fec9d}\label{Graph_8h_aeafe4b5e0ec38475576f29edba8fec9d}} 
+\index{Graph.\+h@{Graph.\+h}!orderG@{orderG}}
+\index{orderG@{orderG}!Graph.\+h@{Graph.\+h}}
+\subsubsection{\texorpdfstring{order\+G()}{orderG()}}
+{\footnotesize\ttfamily int orderG (\begin{DoxyParamCaption}\item[{\hyperlink{structGraph}{Graph}}]{graph }\end{DoxyParamCaption})}
+
+
+
+Returns the number of nodes of {\ttfamily graph}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em graph} & A graph. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+int Its number of nodes. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{Graph_8h_af1b1d5d0c943d780bab64a290e17bf00}\label{Graph_8h_af1b1d5d0c943d780bab64a290e17bf00}} 
+\index{Graph.\+h@{Graph.\+h}!print\+Graph@{print\+Graph}}
+\index{print\+Graph@{print\+Graph}!Graph.\+h@{Graph.\+h}}
+\subsubsection{\texorpdfstring{print\+Graph()}{printGraph()}}
+{\footnotesize\ttfamily void print\+Graph (\begin{DoxyParamCaption}\item[{\hyperlink{structGraph}{Graph}}]{graph }\end{DoxyParamCaption})}
+
+
+
+Displays a graph with a list of nodes and a matrix of edges. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em graph} & the graph to display. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{Graph_8h_a94d5181c70abd1e30f5e9123474e9d3e}\label{Graph_8h_a94d5181c70abd1e30f5e9123474e9d3e}} 
+\index{Graph.\+h@{Graph.\+h}!sizeG@{sizeG}}
+\index{sizeG@{sizeG}!Graph.\+h@{Graph.\+h}}
+\subsubsection{\texorpdfstring{size\+G()}{sizeG()}}
+{\footnotesize\ttfamily int sizeG (\begin{DoxyParamCaption}\item[{\hyperlink{structGraph}{Graph}}]{graph }\end{DoxyParamCaption})}
+
+
+
+Returns the number of edges of {\ttfamily graph}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em graph} & A graph. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+int Its number of edges. 
+\end{DoxyReturn}

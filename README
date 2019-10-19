@@ -1,3 +1,6 @@
+Pour compiler juste le fichier exemple LA MERDE
+gcc  Z3Example.c ./../src/Z3Tools.c -I./../include -std=c11 -lz3 
+
 Assignment for the Complexité and Calculabilité course of the M1 informatique from University of Bordeaux.
 Author: Vincent Penelle (vincent.penelle@u-bordeaux.fr)
 
