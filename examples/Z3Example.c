@@ -16,6 +16,7 @@ int main(int argc, char* argv[]){
     Z3_ast negX = Z3_mk_not(ctx,x);
     printf("Formula %s created.\n",Z3_ast_to_string(ctx,negX));
 
+    printf("absurd \n");
     Z3_ast absurdTab[3] = {x,y,negX};
     Z3_ast absurd = Z3_mk_and(ctx,3,absurdTab);
     printf("Formula %s created.\n",Z3_ast_to_string(ctx,absurd));
