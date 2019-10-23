@@ -34,6 +34,8 @@ Z3_context makeContext(void);
  */
 Z3_ast mk_bool_var(Z3_context ctx, const char * name);
 
+Z3_ast mk_var(Z3_context ctx, const char * name, Z3_sort ty);
+
 /**
  * @brief Tells if a formula is satisfiable, unsatisfiable, or cannot be decided.
  * 

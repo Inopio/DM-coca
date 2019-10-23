@@ -17,31 +17,24 @@
 Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node){
     Z3_sort sort;
     Z3_ast x1;
-    Z3_symbol nb1;
-    Z3_symbol pos1;
-    Z3_symbol k1;
-    Z3_symbol node1;
-    Z3_ast args[5];
-    Z3_ast f;
-    Z3_sort b;
+    Z3_ast nb,p,j,nd,f;
+    Z3_ast args[6];
+    Z3_sort s;
     const char *c = "sommet"; //s comme sommet lol ?
 
     x1 = mk_bool_var(ctx, c);
-    
-    nb1 = Z3_mk_int_symbol(ctx,number);
-   
-    pos1 = Z3_mk_int_symbol(ctx,position);
-    
-    k1 = Z3_mk_int_symbol(ctx,k);
-    
-    node1 = Z3_mk_int_symbol(ctx,node);
-    
-    b = Z3_mk_bool_sort(ctx);
-    f = Z3_mk_const(ctx, nb1, b);
-    f = Z3_mk_const(ctx, pos1, b);
-    f = Z3_mk_const(ctx, k1, b);
-    f = Z3_mk_const(ctx, node1, b);
 
+    s = Z3_mk_int_sort(ctx);
+
+    //nb = Z3_mk_int(ctx,number,s);
+    nb = mk_var(ctx,"number",s);
+    args[0] = x1;
+    args[1] = nb;
+    p = Z3_mk_int(ctx,position,s);
+    j = Z3_mk_int(ctx,k,s);
+    nd = Z3_mk_int(ctx,node,s);
+   f = Z3_mk_and(ctx, 2, args);
+ 
     return f;
 }
 
