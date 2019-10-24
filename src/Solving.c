@@ -1,6 +1,8 @@
 #include "Graph.h"
 #include <z3.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "Z3Tools.h"
 /**
  * @brief Generates a formula consisting of a variable representing the fact that @p node of graph number @p number is at position @p position of an accepting path.
@@ -15,29 +17,30 @@
 
 
 Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node){
-    Z3_sort sort;
-    Z3_ast x1,x2,nb,p,j,nd,f;
-    Z3_sort s;
-
-    x1 = mk_bool_var(ctx, "X");
-    x2 = mk_bool_var(ctx, "X2");
-    //args[0] = x1 ;
-    s = Z3_mk_int_sort(ctx);
-    //nb = Z3_mk_int(ctx,number,s);
-    nb = mk_var(ctx,"1",s);
-    //args[1] = nb;
-    /*
     
-    p = Z3_mk_int(ctx,position,s);
-    args[2] = p;
-    j = Z3_mk_int(ctx,k,s);
-    args[3] = j;
-    nd = Z3_mk_int(ctx,node,s);
-    args[4] = nd;
-    */
-    Z3_ast args[2] = {x1,x2};
-    f = Z3_mk_and(ctx, 2, args);
-    return f;
+    Z3_sort sort;
+    Z3_ast x,f;
+    
+    int t[4] = {number,position,k,node};
+    char * s;
+    char * tmp;
+
+    sprintf(s, "%s", "X ");
+    sprintf(tmp, "%d,", number);
+    strcat(s, tmp);
+    sprintf(tmp, "%d,", position);
+    strcat(s, tmp);
+    sprintf(tmp, "%d,", k);
+    strcat(s, tmp);
+    sprintf(tmp, "%d", node);
+    strcat(s, tmp);
+   
+    x = mk_bool_var(ctx, s);
+    
+    Z3_ast args[1] = {x};
+    f = Z3_mk_and(ctx, 1, args); 
+
+    return x;
 }
 
 
