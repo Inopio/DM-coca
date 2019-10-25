@@ -22,23 +22,22 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
     Z3_ast x,f;
     
     int t[4] = {number,position,k,node};
-    char * s;
-    char * tmp;
+    char s[1024];   //buffer pour stocker la formule principale
+    char tmp[1024]; //buffer temporaire pour récupérer les éléments  number,position,k,node en string
+    
+    sprintf(s, "%s", "X "); //nommage de la variable, X
 
-    sprintf(s, "%s", "X ");
-    sprintf(tmp, "%d,", number);
-    strcat(s, tmp);
-    sprintf(tmp, "%d,", position);
-    strcat(s, tmp);
-    sprintf(tmp, "%d,", k);
-    strcat(s, tmp);
-    sprintf(tmp, "%d", node);
+    for(int i=0; i<3; i++){
+        sprintf(tmp, "%d,", t[i]);
+        strcat(s, tmp);                //concaténation des éléments number... etc à la variable X
+    }
+    sprintf(tmp, "%d", t[3]);   //en dehors de la boucle par question esthétique
     strcat(s, tmp);
    
-    x = mk_bool_var(ctx, s);
+    x = mk_bool_var(ctx, s);    //affectation du nom complet à la variable booléenne
     
     Z3_ast args[1] = {x};
-    f = Z3_mk_and(ctx, 1, args); 
+    f = Z3_mk_and(ctx, 1, args);    //création de la formule ast
 
     return x;
 }

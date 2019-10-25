@@ -1,0 +1,5 @@
+# Ignorer tous les fichiers html
+*.html
+
+# Ignorer tous les fichiers objet
+*.o
