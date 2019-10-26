@@ -23,6 +23,7 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
     
     int t[4] = {number,position,k,node};
     char * s;
+
     sprintf(s, "X %d,%d,%d,%d", number,position,k,node);
    
     x = mk_bool_var(ctx, s);
@@ -43,10 +44,7 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
  * @param pathLength The length of the path to check.
  * @return Z3_ast The formula.
  */
-Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
-
-    
-}
+Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength);
 
 /**
  * @brief Generates a SAT formula satisfiable if and only if all graphs of @p graphs contain an accepting path of common length.
