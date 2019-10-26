@@ -47,19 +47,45 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
 Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
     Z3_ast x1,x2;
     Z3_ast negX1,negX2;
-    Z3_ast f;
-    Z3_ast args[2];
+    Z3_ast f,tmp;
+    Z3_ast *args;
 
    // negX1 = Z3_mk_not(ctx,x);
+
+   //Phi 1
     for(int i=0; i<numGraphs; i++){
         x1 = getNodeVariable(ctx, i, 2, pathLength, 0);
         x2 = getNodeVariable(ctx, i, 2, pathLength, pathLength);
         args[0] = x1;
         args[1] = x2;
-        f = Z3_mk_and(ctx, 2, args); 
+        f = Z3_mk_and(ctx, 2, args);
 
     }
+/*
+    //Phi 2
+    for(int i=0; i<numGraphs; i++){
+        for(int j=0; j<pathLength; j++){
+            x1 = getNodeVariable(ctx, i, 2, pathLength, 0);
+            x2 = getNodeVariable(ctx, i, 2, pathLength, pathLength);
+            args[0] = Z3_mk_not(ctx,x1);
+            args[1] = Z3_mk_not(ctx,x2);
+            tmp = Z3_mk_or(ctx, 2, args);
+            args[0] = Z3_mk_not(ctx,tmp);
+            args[1] = Z3_mk_not(ctx,f);
+            f = Z3_mk_and(ctx, 2, args);
+        }
+    }
 
+    //Phi 3
+    for(int i=0; i<numGraphs; i++){
+        for(int j=0; j<pathLength; j++){
+            x1 = getNodeVariable(ctx, i, 2, pathLength, j);
+            args[0] = Z3_mk_not(ctx,f);
+            args[1] = Z3_mk_not(ctx,x1);
+            f = Z3_mk_and(ctx, 2, args);
+        }
+    }
+*/
     return f;
 
 }
