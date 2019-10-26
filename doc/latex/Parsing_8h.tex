@@ -1,0 +1,52 @@
+\hypertarget{Parsing_8h}{}\section{include/\+Parsing.h File Reference}
+\label{Parsing_8h}\index{include/\+Parsing.\+h@{include/\+Parsing.\+h}}
+
+
+Contains function to convert graphviz files to the Graph\+List structure. Needs first to compile Lexer.\+l and Parser.\+y with bison.  
+
+
+{\ttfamily \#include \char`\"{}Graph\+List.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Graph.\+h\char`\"{}}\newline
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{structGraph}{Graph} \hyperlink{Parsing_8h_a3a9e44a80ea9af50227b7baa5c95fc75}{get\+Graph\+From\+File} (char $\ast$to\+Read)
+\begin{DoxyCompactList}\small\item\em Parses a file and return the \hyperlink{structGraph}{Graph} described by it. If the file with the name given in argument does not exists, it displays an error message and exits the program. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Contains function to convert graphviz files to the Graph\+List structure. Needs first to compile Lexer.\+l and Parser.\+y with bison. 
+
+\begin{DoxyAuthor}{Author}
+Vincent Penelle (\href{mailto:vincent.penelle@u-bordeaux.fr}{\tt vincent.\+penelle@u-\/bordeaux.\+fr}) 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2019-\/07-\/31
+\end{DoxyDate}
+\begin{DoxyCopyright}{Copyright}
+Creative Commons 
+\end{DoxyCopyright}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{Parsing_8h_a3a9e44a80ea9af50227b7baa5c95fc75}\label{Parsing_8h_a3a9e44a80ea9af50227b7baa5c95fc75}} 
+\index{Parsing.\+h@{Parsing.\+h}!get\+Graph\+From\+File@{get\+Graph\+From\+File}}
+\index{get\+Graph\+From\+File@{get\+Graph\+From\+File}!Parsing.\+h@{Parsing.\+h}}
+\subsubsection{\texorpdfstring{get\+Graph\+From\+File()}{getGraphFromFile()}}
+{\footnotesize\ttfamily \hyperlink{structGraph}{Graph} get\+Graph\+From\+File (\begin{DoxyParamCaption}\item[{char $\ast$}]{to\+Read }\end{DoxyParamCaption})}
+
+
+
+Parses a file and return the \hyperlink{structGraph}{Graph} described by it. If the file with the name given in argument does not exists, it displays an error message and exits the program. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em to\+Read} & the name of a file in graphviz format. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Graph\+List The parsed Graph\+List. 
+\end{DoxyReturn}

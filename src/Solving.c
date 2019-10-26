@@ -36,7 +36,7 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
 
 
 /**
- * @brief Generates a SAT formula satisfiable if and only if all graphs of @p graphs contain an accepting path of length @p pathLength.
+ * @brief Generates a SAT formula satisfiable if and only if all graphs of @p graphs contain an accepting path of length @p pathLength.
  * 
  * @param ctx The solver context.
  * @param graphs An array of graphs.
@@ -44,10 +44,28 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
  * @param pathLength The length of the path to check.
  * @return Z3_ast The formula.
  */
-Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength);
+Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
+    Z3_ast x1,x2;
+    Z3_ast negX1,negX2;
+    Z3_ast f;
+    Z3_ast args[2];
+
+   // negX1 = Z3_mk_not(ctx,x);
+    for(int i=0; i<numGraphs; i++){
+        x1 = getNodeVariable(ctx, i, 2, pathLength, 0);
+        x2 = getNodeVariable(ctx, i, 2, pathLength, pathLength);
+        args[0] = x1;
+        args[1] = x2;
+        f = Z3_mk_and(ctx, 2, args); 
+
+    }
+
+    return f;
+
+}
 
 /**
- * @brief Generates a SAT formula satisfiable if and only if all graphs of @p graphs contain an accepting path of common length.
+ * @brief Generates a SAT formula satisfiable if and only if all graphs of @p graphs contain an accepting path of common length.
  * 
  * @param ctx The solver context.
  * @param graphs An array of graphs.
