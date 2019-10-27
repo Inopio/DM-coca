@@ -22,7 +22,7 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
     Z3_ast x,f;
     
     int t[4] = {number,position,k,node};
-    char * s;
+    char s[1024];
 
     sprintf(s, "X %d,%d,%d,%d", number,position,k,node);
    
@@ -47,8 +47,11 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
 Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
     Z3_ast x1,x2;
     Z3_ast negX1,negX2;
-    Z3_ast f,tmp;
-    Z3_ast *args;
+    Z3_ast f,f1, f2, f3, f4, f5, tmp;
+    Z3_ast args[10];
+    Z3_ast save[1000];
+    Z3_ast save2[1000];
+    save[0] = f5;
 
    // negX1 = Z3_mk_not(ctx,x);
 
@@ -58,24 +61,40 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
         x2 = getNodeVariable(ctx, i, 2, pathLength, pathLength);
         args[0] = x1;
         args[1] = x2;
-        f = Z3_mk_and(ctx, 2, args);
+        f1 = Z3_mk_and(ctx, 2, args);
 
     }
-/*
+
     //Phi 2
     for(int i=0; i<numGraphs; i++){
         for(int j=0; j<pathLength; j++){
-            x1 = getNodeVariable(ctx, i, 2, pathLength, 0);
-            x2 = getNodeVariable(ctx, i, 2, pathLength, pathLength);
+            x1 = getNodeVariable(ctx, i, numGraphs, pathLength, j);
+            x2 = getNodeVariable(ctx, i, numGraphs, pathLength, j+1);
+
             args[0] = Z3_mk_not(ctx,x1);
             args[1] = Z3_mk_not(ctx,x2);
-            tmp = Z3_mk_or(ctx, 2, args);
-            args[0] = Z3_mk_not(ctx,tmp);
-            args[1] = Z3_mk_not(ctx,f);
-            f = Z3_mk_and(ctx, 2, args);
-        }
-    }
 
+            tmp = Z3_mk_or(ctx, 2, args);
+            printf("graphe %d, clause temporaire : %s\n",i,Z3_ast_to_string(ctx,tmp));
+            
+           f2 = tmp;
+            args[0] = tmp;
+            args[1] = f2;
+        
+            f3 = f2;
+            save[0] = f2;
+           f3 = Z3_mk_and(ctx, 1, args);
+           //printf("graphe %d, clause : %s\n",i,Z3_ast_to_string(ctx,f3));
+        } 
+        //printf("graphe %d, clause : %s\n",i,Z3_ast_to_string(ctx,f3));
+        f4 = f3;
+        save2[0] = f3;
+        save2[1] = f4;
+        f4 = Z3_mk_and(ctx, 2, save2);
+        //save[0]
+    }
+    
+/*
     //Phi 3
     for(int i=0; i<numGraphs; i++){
         for(int j=0; j<pathLength; j++){
@@ -86,7 +105,7 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
         }
     }
 */
-    return f;
+    return f4;
 
 }
 
