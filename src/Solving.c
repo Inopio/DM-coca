@@ -51,61 +51,145 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
     Z3_ast args[10];
     Z3_ast save[1000];
     Z3_ast save2[1000];
-    save[0] = f5;
+    Z3_ast fargs[10];
 
    // negX1 = Z3_mk_not(ctx,x);
 
+   Z3_ast savephi1[2];
    //Phi 1
+
     for(int i=0; i<numGraphs; i++){
-        x1 = getNodeVariable(ctx, i, 2, pathLength, 0);
-        x2 = getNodeVariable(ctx, i, 2, pathLength, pathLength);
+        x1 = getNodeVariable(ctx, i, 0, pathLength, 0);
+        x2 = getNodeVariable(ctx, i, pathLength, pathLength, pathLength);
         args[0] = x1;
         args[1] = x2;
         f1 = Z3_mk_and(ctx, 2, args);
-
-    }
-
-    //Phi 2
-    for(int i=0; i<numGraphs; i++){
-        for(int j=0; j<pathLength; j++){
-            x1 = getNodeVariable(ctx, i, numGraphs, pathLength, j);
-            x2 = getNodeVariable(ctx, i, numGraphs, pathLength, j+1);
-
-            args[0] = Z3_mk_not(ctx,x1);
-            args[1] = Z3_mk_not(ctx,x2);
-
-            tmp = Z3_mk_or(ctx, 2, args);
-            printf("graphe %d, clause temporaire : %s\n",i,Z3_ast_to_string(ctx,tmp));
-            
-           f2 = tmp;
-            args[0] = tmp;
-            args[1] = f2;
         
-            f3 = f2;
-            save[0] = f2;
-           f3 = Z3_mk_and(ctx, 1, args);
-           //printf("graphe %d, clause : %s\n",i,Z3_ast_to_string(ctx,f3));
-        } 
-        //printf("graphe %d, clause : %s\n",i,Z3_ast_to_string(ctx,f3));
-        f4 = f3;
-        save2[0] = f3;
-        save2[1] = f4;
-        f4 = Z3_mk_and(ctx, 2, save2);
-        //save[0]
-    }
-    
-/*
-    //Phi 3
-    for(int i=0; i<numGraphs; i++){
-        for(int j=0; j<pathLength; j++){
-            x1 = getNodeVariable(ctx, i, 2, pathLength, j);
-            args[0] = Z3_mk_not(ctx,f);
-            args[1] = Z3_mk_not(ctx,x1);
-            f = Z3_mk_and(ctx, 2, args);
+        if(i == 0){
+        savephi1[0] = f1;
+        }else{
+        args[0] = savephi1[0];
+        args[1] = f1;
+            f1 = Z3_mk_and(ctx, 2, args);
+            savephi1[0] = f1;
         }
     }
-*/
-    return f4;
+
+    
+  //Phi 2
+    for(int i=0; i<numGraphs; i++){
+        for(int j=0; j<pathLength; j++){
+            for(int q =0; q<orderG(graphs[i]); q++){
+                for(int r =0; r<orderG(graphs[i]); r++){
+                    if(q != r)
+                        x1 = getNodeVariable(ctx, i, j, pathLength, q);
+                        x2 = getNodeVariable(ctx, i, j, pathLength, r);
+
+                        args[0] = Z3_mk_not(ctx,x1);
+                        args[1] = Z3_mk_not(ctx,x2);
+
+                        tmp = Z3_mk_or(ctx, 2, args);
+                        save[0] = tmp;
+                        if(save2[0] == NULL){
+                                f2 = tmp;
+                                save2 [0] = tmp;
+                                save2[1] = f2;
+                        }else{
+                                save2[1] = tmp;
+                                f2=Z3_mk_and(ctx, 2, save2);
+                                save2[0] = f2;
+                        }
+                }
+            }
+        }
+    } 
+
+
+    //Phi 3
+   Z3_ast savephi3[2];
+    for(int i = 0; i < numGraphs; i++){
+        for(int q = 0; q < orderG(graphs[i]); q++){
+            for(int j = 0; j < pathLength; j++){
+                x1 = getNodeVariable(ctx, i, j, pathLength, q);
+                if(savephi3[0]==NULL){
+                    f3 = x1;
+                    savephi3[0] = x1;
+                    savephi3[1] = f3;
+                }else{
+                    savephi3[1] = x1;
+                    f3 = Z3_mk_and(ctx, 2, savephi3);
+                    savephi3[0] = f3;
+                }
+            }
+        }
+    }
+    
+    //Phi 4
+
+    Z3_ast savephi4[2];
+    for(int i = 0; i < numGraphs; i++){
+        for(int q = 0; q < orderG(graphs[i]); q++){
+            for(int j = 0; j < pathLength; j++){
+                for(int l = 0; l < pathLength; l++){
+                    if(j != l){
+                        x1 = getNodeVariable(ctx, i, j, pathLength, q);
+                        x2 = getNodeVariable(ctx, i, l, pathLength, q);
+                        args[0] = Z3_mk_not(ctx,x1);
+                        args[1] = Z3_mk_not(ctx,x2);
+                        tmp = Z3_mk_or(ctx, 2, args);
+                        if(savephi4[0] == NULL){
+                                f4 = tmp;
+                                savephi4[0] = tmp;
+                        }else{
+                                savephi4[1] = tmp;
+                                f4=Z3_mk_and(ctx, 2, savephi4);
+                                savephi4[0] = f4;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    Z3_ast args1[10];
+    Z3_ast save3[10];
+    
+    //Phi 5
+
+    printf("tab %s\n",Z3_ast_to_string(ctx,args[0]));
+    for(int i=0; i<numGraphs; i++){
+        for(int j=0; j<pathLength-1; j++){
+            for(int q =0; q<orderG(graphs[i]); q++){
+                for(int r =0; r<orderG(graphs[i]); r++){
+                    if(isEdge(graphs[i],q,r)){
+                        args1[0] = getNodeVariable(ctx, i, j, pathLength, q);
+                        args1[1] = getNodeVariable(ctx, i, j+1, pathLength, r);
+
+                        tmp = Z3_mk_and(ctx, 2, args1);
+                        if(save3[0] == NULL){
+                                f5 = tmp;
+                                save3[0] = tmp;
+                                save3[1] = f5;
+                        }else{
+                                save3[0] = tmp;
+                                f3=Z3_mk_and(ctx, 2, save3);
+                                save3[1] = f5;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fargs[0] = f1;
+    fargs[1] = f2;
+    fargs[2] = f3;
+    fargs[3] = f4;
+    fargs[4] = f5;
+    f = Z3_mk_and(ctx,5,fargs);
+    
+    return f2;
 
 }
 
