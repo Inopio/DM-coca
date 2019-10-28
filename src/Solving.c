@@ -22,27 +22,28 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
 }
 
 Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
+
+    if(pathLength == 0){
+        return Z3_mk_false(ctx);
+    }
+
     Z3_ast x1,x2;                       //variables construction des clauses
     Z3_ast negX1,negX2;                 //négation des variables
     Z3_ast f,f1, f2, f3, f4, f5, tmp;   //variables stockage des formules
-    Z3_ast args[10];                    //tableaux de construction des formules
+    Z3_ast args[2];                    //tableaux de construction des formules
     Z3_ast save[1000];
     Z3_ast save2[1000];
-    Z3_ast fargs[10];
-
-   // negX1 = Z3_mk_not(ctx,x);
+    Z3_ast fargs[100];
 
    Z3_ast savephi1[2];
    //Phi 1
-
     for(int i=0; i<numGraphs; i++){
-        orderG(graphs[i]);
         x1 = getNodeVariable(ctx, i, 0, pathLength, 0);
-        x2 = getNodeVariable(ctx, i, pathLength, pathLength, pathLength);
+        x2 = getNodeVariable(ctx, i, pathLength, pathLength, 1);
         args[0] = x1;
         args[1] = x2;
         f1 = Z3_mk_and(ctx, 2, args);
-        
+        printf("1 %s\n",Z3_ast_to_string(ctx,f1));
         if(i == 0){
         savephi1[0] = f1;
         }else{
@@ -53,15 +54,15 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
         }
     }
 
+
   //Phi 2
     for(int i=0; i<numGraphs; i++){
         for(int j=0; j<pathLength; j++){
             for(int q =0; q<orderG(graphs[i]); q++){
                 for(int r =0; r<orderG(graphs[i]); r++){
-                    if(q != r)
+                    if(q != r){
                         x1 = getNodeVariable(ctx, i, j, pathLength, q);
                         x2 = getNodeVariable(ctx, i, j, pathLength, r);
-
                         args[0] = Z3_mk_not(ctx,x1);
                         args[1] = Z3_mk_not(ctx,x2);
 
@@ -76,11 +77,13 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
                                 f2=Z3_mk_and(ctx, 2, save2);
                                 save2[0] = f2;
                         }
+                    }
                 }
             }
         }
-    } 
-    
+    }
+    printf("test\n");
+
     //Phi 3
    Z3_ast savephi3[2];
     for(int i = 0; i < numGraphs; i++){
@@ -99,9 +102,8 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
             }
         }
     }
-    
+/*
     //Phi 4
-
     Z3_ast savephi4[2];
     for(int i = 0; i < numGraphs; i++){
         for(int q = 0; q < orderG(graphs[i]); q++){
@@ -126,7 +128,7 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
             }
         }
     }
-    
+    printf("test\n");
     
     Z3_ast args1[10];
     Z3_ast save3[10];
@@ -155,14 +157,18 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
             }
         }
     }
-    
+    printf("test\n");
+
+
     fargs[0] = f1;
-    //fargs[1] = f2;
-    fargs[1] = f3;
-    fargs[2] = f4;
-    fargs[3] = f5;
-    f = Z3_mk_and(ctx,4,fargs);
-    return f;
+    fargs[1] = f2;
+    fargs[2] = f3;
+    fargs[3] = f4;
+    fargs[4] = f5;
+
+    //f = Z3_mk_and(ctx,2,fargs);
+    */
+    return f1;
 }
 
 /**
@@ -186,7 +192,7 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
     }
     
     printf("minsize %d\n",min_size);
-    for(int j=1; j<min_size; j++){
+    for(int j=0; j<min_size; j++){
         f = graphsToPathFormula(ctx,graphs,numGraphs,j);   //longueur commune de taille j
         if(isFormulaSat(ctx,f)) { //si on a une longueur commune de taille j (f satisfiable)
            break;
