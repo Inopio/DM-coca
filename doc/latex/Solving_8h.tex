@@ -135,6 +135,20 @@ Generates a S\+A\+T formula satisfiable if and only if all graphs of {\ttfamily
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
+Z3\+\_\+ast The formula.
+\end{DoxyReturn}
+Generates a S\+A\+T formula satisfiable if and only if all graphs of {\ttfamily graphs} contain an accepting path of common length.
+
+
+\begin{DoxyParams}{Parameters}
+{\em ctx} & The solver context. \\
+\hline
+{\em graphs} & An array of graphs. \\
+\hline
+{\em num\+Graphs} & The number of graphs in {\ttfamily graphs}. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
 Z3\+\_\+ast The formula. 
 \end{DoxyReturn}
 \mbox{\Hypertarget{Solving_8h_adda1df41c9465c0e108f80e81c453a0d}\label{Solving_8h_adda1df41c9465c0e108f80e81c453a0d}} 

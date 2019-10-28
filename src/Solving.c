@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "Z3Tools.h"
 
+#define min(a,b) (a<=b?a:b)
 
 Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node){
     
@@ -54,7 +55,7 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
 
   //Phi 2
     for(int i=0; i<numGraphs; i++){
-        for(int j=0; j<=pathLength; j++){
+        for(int j=0; j<pathLength; j++){
             for(int q =0; q<orderG(graphs[i]); q++){
                 for(int r =0; r<orderG(graphs[i]); r++){
                     if(q != r)
@@ -160,7 +161,7 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
     fargs[1] = f3;
     fargs[2] = f4;
     fargs[3] = f5;
-    f = Z3_mk_and(ctx,2,fargs);
+    f = Z3_mk_and(ctx,4,fargs);
     return f;
 }
 
@@ -172,7 +173,27 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
  * @param numGraphs The number of graphs in @p graphs.
  * @return Z3_ast The formula.
  */
-Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs);
+Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs){
+    Z3_ast f;
+    //Pour obtenir la limite de k, majorée par le plus petit des graphes 
+    int min_size;
+    
+    min_size = orderG(graphs[0]);
+    for(int i = 1; i < numGraphs; i++){
+        if(min_size < orderG(graphs[i])){
+            min_size = orderG(graphs[i]);
+        }
+    }
+    
+    printf("minsize %d\n",min_size);
+    for(int j=1; j<min_size; j++){
+        f = graphsToPathFormula(ctx,graphs,numGraphs,j);   //longueur commune de taille j
+        if(isFormulaSat(ctx,f)) { //si on a une longueur commune de taille j (f satisfiable)
+           break;
+        }     
+    }
+    return f;
+}
 
 /**
  * @brief Gets the length of the solution from a given model.
