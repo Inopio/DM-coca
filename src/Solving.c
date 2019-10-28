@@ -4,16 +4,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "Z3Tools.h"
-/**
- * @brief Generates a formula consisting of a variable representing the fact that @p node of graph number @p number is at position @p position of an accepting path.
-
- * @param ctx The solver context.
- * @param number The number of the graph.
- * @param position The position in the path.
- * @param k The mysterious k from the subject of this assignment.
- * @param node The node identifier.
- * @return Z3_ast The formula.
- */
 
 
 Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node){
@@ -27,28 +17,14 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
     sprintf(s, "X %d,%d,%d,%d", number,position,k,node);
    
     x = mk_bool_var(ctx, s);
-    
-    Z3_ast args[1] = {x};
-    f = Z3_mk_and(ctx, 1, args); 
-
     return x;
 }
 
-
-/**
- * @brief Generates a SAT formula satisfiable if and only if all graphs of @p graphs contain an accepting path of length @p pathLength.
- * 
- * @param ctx The solver context.
- * @param graphs An array of graphs.
- * @param numGraphs The number of graphs in @p graphs.
- * @param pathLength The length of the path to check.
- * @return Z3_ast The formula.
- */
 Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
-    Z3_ast x1,x2;
-    Z3_ast negX1,negX2;
-    Z3_ast f,f1, f2, f3, f4, f5, tmp;
-    Z3_ast args[10];
+    Z3_ast x1,x2;                       //variables construction des clauses
+    Z3_ast negX1,negX2;                 //négation des variables
+    Z3_ast f,f1, f2, f3, f4, f5, tmp;   //variables stockage des formules
+    Z3_ast args[10];                    //tableaux de construction des formules
     Z3_ast save[1000];
     Z3_ast save2[1000];
     Z3_ast fargs[10];
@@ -59,6 +35,7 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
    //Phi 1
 
     for(int i=0; i<numGraphs; i++){
+        orderG(graphs[i]);
         x1 = getNodeVariable(ctx, i, 0, pathLength, 0);
         x2 = getNodeVariable(ctx, i, pathLength, pathLength, pathLength);
         args[0] = x1;
@@ -75,10 +52,9 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
         }
     }
 
-    
   //Phi 2
     for(int i=0; i<numGraphs; i++){
-        for(int j=0; j<pathLength; j++){
+        for(int j=0; j<=pathLength; j++){
             for(int q =0; q<orderG(graphs[i]); q++){
                 for(int r =0; r<orderG(graphs[i]); r++){
                     if(q != r)
@@ -103,8 +79,7 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
             }
         }
     } 
-
-
+    
     //Phi 3
    Z3_ast savephi3[2];
     for(int i = 0; i < numGraphs; i++){
@@ -156,8 +131,6 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
     Z3_ast save3[10];
     
     //Phi 5
-
-    printf("tab %s\n",Z3_ast_to_string(ctx,args[0]));
     for(int i=0; i<numGraphs; i++){
         for(int j=0; j<pathLength-1; j++){
             for(int q =0; q<orderG(graphs[i]); q++){
@@ -181,16 +154,14 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
             }
         }
     }
-
-    fargs[0] = f1;
-    fargs[1] = f2;
-    fargs[2] = f3;
-    fargs[3] = f4;
-    fargs[4] = f5;
-    f = Z3_mk_and(ctx,5,fargs);
     
-    return f2;
-
+    fargs[0] = f1;
+    //fargs[1] = f2;
+    fargs[1] = f3;
+    fargs[2] = f4;
+    fargs[3] = f5;
+    f = Z3_mk_and(ctx,2,fargs);
+    return f;
 }
 
 /**
