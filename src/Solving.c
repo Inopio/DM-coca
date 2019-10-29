@@ -8,9 +8,7 @@
 #define min(a,b) (a<=b?a:b)
 
 Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node){
-    
-    Z3_sort sort;
-    Z3_ast x,f;
+    Z3_ast x;
     
     int t[4] = {number,position,k,node};
     char s[1024];
@@ -210,7 +208,7 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
     int min_size;
     
     min_size = orderG(graphs[0]);
-    for(int i = 1; i < numGraphs; i++){
+    for(int i =1; i < numGraphs; i++){
         if(min_size < orderG(graphs[i])){
             min_size = orderG(graphs[i]);
         }
@@ -219,7 +217,7 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
     printf("minsize %d\n",min_size);
     for(int j=0; j<min_size; j++){
         f = graphsToPathFormula(ctx,graphs,numGraphs,j);   //longueur commune de taille j
-        if(isFormulaSat(ctx,f)) { //si on a une longueur commune de taille j (f satisfiable)
+        if(isFormulaSat(ctx,f)==1) { //si on a une longueur commune de taille j (f satisfiable)
            break;
         }     
     }
@@ -234,7 +232,14 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
  * @param graphs An array of graphs.
  * @return int The length of a common simple accepting path in all graphs from @p graphs.
  */ 
-int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs);
+int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs){
+    /*
+    Z3_ast f = graphsToFullFormula(ctx,Graphs,2);   //fixé pour le moment mais pas bon
+    printf("val : %d\n",Z3_ast_to_string(ctx,y),valueOfVarInModel(ctx,model,f));
+    return valueOfVarInModel(ctx,model,f);
+    */
+   return 42;
+}
 
 /**
  * @brief Displays the paths of length @p pathLength of each graphs in @p graphs described by @p model.

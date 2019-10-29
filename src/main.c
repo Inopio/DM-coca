@@ -20,18 +20,26 @@ int main (void){
     //graph[0] = getGraphFromFile("graphs/generic-instances/positive-instances/Taille10_pos/instance1/G4.dot");
     graph[0] = getGraphFromFile("graphs/generic-instances/negative-instances/Taille10_neg/instance2/G2.dot");
 
-    printGraph(graph[0]);
+    //printGraph(graph[0]);
 
     
-    Z3_ast f = graphsToPathFormula(c,graph,1,2);
-    printf("Graph formula : %s\n",Z3_ast_to_string(c,f));
+    Z3_ast f = graphsToPathFormula(c,graph,1,0);
+   // printf("Graph formula : %s\n",Z3_ast_to_string(c,f));
 
     Z3_lbool isSat = isFormulaSat(c,f);
     printf("Is sat ? : %d\n",isSat);
 
-    /*
-    Z3_ast f2 = graphsToFullFormula(c,graph,2);
-    printf("Graph formula : %s\n",Z3_ast_to_string(c,f2));
-    */
+    
+    Z3_ast f2 = graphsToFullFormula(c,graph,1);
+    int isSat2 = isFormulaSat(c,f2);
+    printf("Is sat ? : %d\n",isSat2);
+    if(isSat2 ==1){
+        Z3_model model = getModelFromSatFormula(c,f2);
+        int k = getSolutionLengthFromModel(c,model,graph);
+        printf("Longueur commune %d\n",k);
+    }
+    
+    
+    
     Z3_del_context(c);
 }
