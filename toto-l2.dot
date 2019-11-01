@@ -1,6 +1,8 @@
 digraph toto {
-s1 [initial=1,color=green];
-t1 [final=1,color=red];
-q3 -> s1 -> q2 -> 
-s2 -> s2 -> q -> 
+s2 [initial=1,color=green];
+t2 [final=1,color=red];
+s2 -> q -> t2;
+q8 [initial=1,color=green];
+q1 [final=1,color=red];
+q8 -> q3 -> q1;
 }

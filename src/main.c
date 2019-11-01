@@ -10,18 +10,14 @@ int main (){
     Z3_ast a = getNodeVariable(c,1,2,3,4);
     
     Graph graph[2];
-    graph[0] = getGraphFromFile("graphs/assignment-instance/G1.dot");
+    //graph[0] = getGraphFromFile("graphs/assignment-instance/G1.dot");
     //graph[0] = getGraphFromFile("graphs/assignment-instance/triangle.dot");
-    graph[1] = getGraphFromFile("graphs/assignment-instance/triangle.dot");
+    graph[0] = getGraphFromFile("graphs/assignment-instance/triangle.dot");
     //graph[0] = getGraphFromFile("graphs/generic-instances/positive-instances/Taille10_pos/instance1/G1.dot");
-   // graph[0] = getGraphFromFile("graphs/assignment-instance/G1.dot");
-   // graph[3] = getGraphFromFile("graphs/assignment-instance/triangle.dot");
-   // graph[0] = getGraphFromFile("/net/cremi/sportejoie/espaces/travail/S7/Complexité Calculabilité/assignment/src/G1.dot");
-   // graph[0] = getGraphFromFile("graphs/generic-instances/negative-instances/Taille30_neg/instance3/G1.dot");
-    //graph[1] = getGraphFromFile("graphs/generic-instances/positive-instances/Taille20_pos/instance1/G1.dot");
+    graph[1] = getGraphFromFile("graphs/generic-instances/positive-instances/Taille10_pos/instance1/G2.dot");
    // graph[0] = getGraphFromFile("graphs/generic-instances/negative-instances/Taille10_neg/instance2/G3.dot");   // longeur 0 oui
 
-    //printGraph(graph[0]);
+    printGraph(graph[1]);
 
     /*  OK
     Z3_ast f = graphsToPathFormula(c,graph,2,2);

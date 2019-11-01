@@ -150,6 +150,10 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
     Z3_ast savephi5_or[2];
     Z3_ast savephi5_and[2];
         for(int i=0; i<numGraphs; i++){
+            for(s=0;s<orderG(graphs[i]) && !isSource(graphs[i],s);s++);
+            for(t=0;t<orderG(graphs[i]) && !isTarget(graphs[i],t);t++);
+            x1 = getNodeVariable(ctx, i, 0, pathLength, s);
+            x2 = getNodeVariable(ctx, i, pathLength, pathLength, t);
             if(pathLength > 1){
                 for(int j=0; j<pathLength; j++){
                     Z3_ast f5_or;
@@ -182,9 +186,9 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
                     }
                 }
             }else{
-                if(isEdge(graphs[i],0,1)){
-                    x1 = getNodeVariable(ctx, i, 0, pathLength, 0);
-                    x2 = getNodeVariable(ctx, i, pathLength, pathLength, 1);
+                if(isEdge(graphs[i],s,t)){
+                    x1 = getNodeVariable(ctx, i, 0, pathLength, s);
+                    x2 = getNodeVariable(ctx, i, pathLength, pathLength, t);
                     tmp = Z3_mk_and(ctx, 2, args1);
                     //test = true;
                     if(savephi5_and[0] == NULL){
@@ -226,7 +230,7 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
     int min_size;
     
     min_size = orderG(graphs[0]);
-    for(int i =1; i < numGraphs; i++){
+    for(int i =0; i < numGraphs; i++){
         if(min_size < orderG(graphs[i])){
             min_size = orderG(graphs[i]);
         }
@@ -284,16 +288,21 @@ int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs){
  * @param pathLength The length of path.
  */
 void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGraph, int pathLength){
+    printf("Model = %s\n",Z3_model_to_string(ctx,model));
     for(int i=0; i<numGraph; i++){
         printf("Path from graph %d: ",i);
-        for(int j=0; j<pathLength; j++){
-            for(int k=0; k<=pathLength; k++){
-                for(int q=0; q<orderG(graphs[i]); q++){
-                    if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,j,k,q)) == true){
+        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,0,pathLength,0)) == true){
+              printf("%s ",getNodeName(graphs[i],0),i,pathLength);
+          for(int j=1; j<pathLength; j++){
+                for(int q=2; q<orderG(graphs[i]); q++){
+                    if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,j,pathLength,q)) == true){
                         printf("%s ",getNodeName(graphs[i],q));
                     }
-                }
-            }
+                  }
+               }
+        }
+        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,1)) == true){
+              printf("%s ",getNodeName(graphs[i],1));
         }
         printf("\n");
     }
@@ -316,19 +325,32 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
 
     sprintf(s,"digraph %s {\n",name);
     fputs(s, f);
-    //&s = NULL;
-    fputs("s1 [initial=1,color=green];\n",f);
-	fputs("t1 [final=1,color=red];\n",f);
     for(int i=0; i<numGraph; i++){
-        for(int j=0; j<pathLength; j++){
-            for(int k=0; k<=pathLength; k++){
-                for(int q=0; q<orderG(graphs[i]); q++){
-                    if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,j,k,q)) == true){
+        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,0,pathLength,0)) == true){
+            sprintf(s,"%s ",getNodeName(graphs[i],0));
+            fputs(s,f);
+            fputs("[initial=1,color=green];\n",f);
+        }
+        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,1)) == true){
+            sprintf(s,"%s ",getNodeName(graphs[i],1));
+            fputs(s,f);
+            fputs("[final=1,color=red];\n",f);
+        }
+        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,0,pathLength,0)) == true){
+            sprintf(s,"%s -> ",getNodeName(graphs[i],0));
+            fputs(s,f);
+            for(int j=1; j<pathLength; j++){
+                for(int q=2; q<orderG(graphs[i]); q++){
+                    if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,j,pathLength,q)) == true){
                         sprintf(s,"%s -> ",getNodeName(graphs[i],q));
                         fputs(s,f);
                     }
                 }
             }
+        }
+        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,1)) == true){
+            sprintf(s,"%s;",getNodeName(graphs[i],1));
+            fputs(s,f);
         }
         fputs("\n",f);
     }
