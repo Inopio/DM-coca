@@ -31,18 +31,15 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
         }
     }
     int s,t;                            //indices des sommets s et t du graphe
-    Z3_ast x1,x2,tsave;                       //variables construction des clauses
+    Z3_ast x1,x2;                       //variables construction des clauses
     Z3_ast negX1,negX2;                 //négation des variables
-    Z3_ast f,f1, f2, f3, f4, f5, tmp;   //variables stockage des formules
-    Z3_ast args[2];                    //tableaux de construction des formules
-    Z3_ast save[1000];
-    Z3_ast save2[1000];
-    Z3_ast fargs[100];
+    Z3_ast f, f1, f2, f3, f4, f5, tmp;  //variables stockage des formules
+    Z3_ast args[2];                     //tableaux de construction des formules
 
-   Z3_ast savephi1[2];
-   
    //Phi 1
-    for(int i=0; i<numGraphs; i++){
+    Z3_ast * savephi1 = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    savephi1[0] = NULL;
+    for(int i = 0; i<numGraphs; i++){
         for(s=0;s<orderG(graphs[i]) && !isSource(graphs[i],s);s++);
         for(t=0;t<orderG(graphs[i]) && !isTarget(graphs[i],t);t++);
         x1 = getNodeVariable(ctx, i, 0, pathLength, s);
@@ -52,18 +49,21 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
         args[1] = x2;
         f1 = Z3_mk_and(ctx, 2, args);
         if(i == 0){
-        savephi1[0] = f1;
+            savephi1[0] = f1;
         }else{
-        args[0] = savephi1[0];
-        args[1] = f1;
+            args[0] = savephi1[0];
+            args[1] = f1;
             f1 = Z3_mk_and(ctx, 2, args);
             savephi1[0] = f1;
         }
     }
+    free(savephi1);
     
-  //Phi 2
+    //Phi 2
+    Z3_ast * savephi2 = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    savephi2[0] = NULL;
     for(int i=0; i<numGraphs; i++){
-        for(int j=0; j<pathLength; j++){
+        for(int j=0; j<=pathLength; j++){
             for(int q =0; q<orderG(graphs[i]); q++){
                 for(int r =0; r<orderG(graphs[i]); r++){
                     if(q != r){
@@ -73,27 +73,28 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
                         args[1] = Z3_mk_not(ctx,x2);
 
                         tmp = Z3_mk_or(ctx, 2, args);
-                        save[0] = tmp;
-                        if(save2[0] == NULL){
-                                f2 = tmp;
-                                save2 [0] = tmp;
-                                save2[1] = f2;
+                        if(savephi2[0] == NULL){
+                            f2 = tmp;
+                            savephi2[0] = f2;
                         }else{
-                                save2[1] = tmp;
-                                f2=Z3_mk_and(ctx, 2, save2);
-                                save2[0] = f2;
+                            savephi2[1] = tmp;
+                            f2 = Z3_mk_and(ctx, 2, savephi2);
+                            savephi2[0] = f2;
                         }
                     }
                 }
             }
         }
     }
+    free(savephi2);
 
     //Phi 3
-   Z3_ast savephi3_or[2];
-   Z3_ast savephi3_and[2];
+    Z3_ast * savephi3_or = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    savephi3_or[0] = NULL;
+    Z3_ast * savephi3_and = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    savephi3_and[0] = NULL;
    for(int i = 0; i < numGraphs; i++){
-       for(int j = 0; j < pathLength; j++){
+       for(int j = 0; j <= pathLength; j++){
            Z3_ast f3_or;
            for(int q = 0; q < orderG(graphs[i]); q++){
                x1 = getNodeVariable(ctx, i, j, pathLength, q);
@@ -118,13 +119,16 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
             }
        }
    }
+   free(savephi3_or);
+   free(savephi3_and);
 
     //Phi 4
-    Z3_ast savephi4[2];
+    Z3_ast * savephi4 = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    savephi4[0] = NULL;
     for(int i = 0; i < numGraphs; i++){
         for(int q = 0; q < orderG(graphs[i]); q++){
-            for(int j = 0; j < pathLength; j++){
-                for(int l = 0; l < pathLength; l++){
+            for(int j = 0; j <= pathLength; j++){
+                for(int l = 0; l <= pathLength; l++){
                     if(j != l){
                         x1 = getNodeVariable(ctx, i, j, pathLength, q);
                         x2 = getNodeVariable(ctx, i, l, pathLength, q);
@@ -144,11 +148,14 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
             }
         }
     }
+    free(savephi4);
 
     //Phi 5
-    Z3_ast args1[2];
-    Z3_ast savephi5_or[2];
-    Z3_ast savephi5_and[2];
+    Z3_ast * args1 = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    Z3_ast * savephi5_or = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    Z3_ast * savephi5_and = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    savephi5_or[0] = NULL;
+    savephi5_and[0] = NULL;
         for(int i=0; i<numGraphs; i++){
             for(s=0;s<orderG(graphs[i]) && !isSource(graphs[i],s);s++);
             for(t=0;t<orderG(graphs[i]) && !isTarget(graphs[i],t);t++);
@@ -190,7 +197,6 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
                     x1 = getNodeVariable(ctx, i, 0, pathLength, s);
                     x2 = getNodeVariable(ctx, i, pathLength, pathLength, t);
                     tmp = Z3_mk_and(ctx, 2, args1);
-                    //test = true;
                     if(savephi5_and[0] == NULL){
                             f5 = tmp;
                             savephi5_and[0] = tmp;
@@ -204,6 +210,11 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
                 }
             }
         }
+        free(args1);
+        free(savephi5_or);
+        free(savephi5_and);
+
+    Z3_ast fargs[5];
 
     fargs[0] = f1;
     fargs[1] = f2;
@@ -254,7 +265,7 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
  * @return int The length of a common simple accepting path in all graphs from @p graphs.
  */ 
 int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs){
-    int max =0;
+    int max = 0;
     //Pour obtenir la limite de k, majorée par le plus petit des graphes 
     int min_size;
     min_size = orderG(graphs[0]);
@@ -289,20 +300,28 @@ int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs){
  */
 void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGraph, int pathLength){
     printf("Model = %s\n",Z3_model_to_string(ctx,model));
+    int s,t;
     for(int i=0; i<numGraph; i++){
         printf("Path from graph %d: ",i);
-        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,0,pathLength,0)) == true){
-              printf("%s ",getNodeName(graphs[i],0),i,pathLength);
-          for(int j=1; j<pathLength; j++){
-                for(int q=2; q<orderG(graphs[i]); q++){
-                    if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,j,pathLength,q)) == true){
-                        printf("%s ",getNodeName(graphs[i],q));
-                    }
-                  }
-               }
+
+        for(s=0;s<orderG(graphs[i]) && !isSource(graphs[i],s);s++); //Find the source s in the graph i
+        for(t=0;t<orderG(graphs[i]) && !isTarget(graphs[i],t);t++); //Find the target t in the graph i
+
+        //Source
+        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,0,pathLength,s)) == true){
+            printf("%s ",getNodeName(graphs[i],s),i,pathLength);
         }
-        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,1)) == true){
-              printf("%s ",getNodeName(graphs[i],1));
+        //Build the path between the source and the destination
+        for(int j=1; j<pathLength; j++){
+            for(int q=0; q<orderG(graphs[i]); q++){
+                if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,j,pathLength,q)) == true){
+                    printf("%s ",getNodeName(graphs[i],q));
+                }
+            }
+        }
+        //Destination
+        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,t)) == true){
+              printf("%s ",getNodeName(graphs[i],t));
         }
         printf("\n");
     }
@@ -320,36 +339,53 @@ void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numG
  */
 void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGraph, int pathLength, char* name){
     char s[1024];
-    sprintf(s,"%s-l%d.dot",name,pathLength);
+    int source, target;
+
+    if(name == NULL){
+        sprintf(s,"result-l%d.dot",pathLength);
+    }else{
+        sprintf(s,"%s-l%d.dot",name,pathLength);
+    }
     FILE *f = fopen(s,"w+");
 
     sprintf(s,"digraph %s {\n",name);
     fputs(s, f);
+
     for(int i=0; i<numGraph; i++){
-        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,0,pathLength,0)) == true){
-            sprintf(s,"%s ",getNodeName(graphs[i],0));
+
+        for(source=0;source<orderG(graphs[i]) && !isSource(graphs[i],source);source++); //Find the source in the graph i
+        for(target=0;target<orderG(graphs[i]) && !isTarget(graphs[i],target);target++); //Find the target in the graph i
+
+        //Set the source --- coloration
+        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,0,pathLength,source)) == true){
+            sprintf(s,"_%d_%s ",i,getNodeName(graphs[i],source));
             fputs(s,f);
             fputs("[initial=1,color=green];\n",f);
         }
-        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,1)) == true){
-            sprintf(s,"%s ",getNodeName(graphs[i],1));
+        //Set the destination --- coloration
+        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,target)) == true){
+            sprintf(s,"_%d_%s ",i,getNodeName(graphs[i],target));
             fputs(s,f);
             fputs("[final=1,color=red];\n",f);
         }
-        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,0,pathLength,0)) == true){
-            sprintf(s,"%s -> ",getNodeName(graphs[i],0));
+
+        //Place at first the source at the start of the path
+        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,0,pathLength,source)) == true){
+            sprintf(s,"_%d_%s -> ",i,getNodeName(graphs[i],source));
             fputs(s,f);
-            for(int j=1; j<pathLength; j++){
-                for(int q=2; q<orderG(graphs[i]); q++){
-                    if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,j,pathLength,q)) == true){
-                        sprintf(s,"%s -> ",getNodeName(graphs[i],q));
-                        fputs(s,f);
-                    }
+        }
+        //Build the path between the source and the destination
+        for(int j=1; j<pathLength; j++){
+            for(int q=0; q<orderG(graphs[i]); q++){
+                if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,j,pathLength,q)) == true){
+                    sprintf(s,"_%d_%s -> ",i,getNodeName(graphs[i],q));
+                    fputs(s,f);
                 }
             }
         }
-        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,1)) == true){
-            sprintf(s,"%s;",getNodeName(graphs[i],1));
+        //Place at last the destination at the end of the path
+        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,target)) == true){
+            sprintf(s,"_%d_%s;",i,getNodeName(graphs[i],target));
             fputs(s,f);
         }
         fputs("\n",f);

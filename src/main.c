@@ -12,9 +12,10 @@ int main (){
     Graph graph[2];
     //graph[0] = getGraphFromFile("graphs/assignment-instance/G1.dot");
     //graph[0] = getGraphFromFile("graphs/assignment-instance/triangle.dot");
-    graph[0] = getGraphFromFile("graphs/assignment-instance/triangle.dot");
+    //graph[0] = getGraphFromFile("graphs/assignment-instance/triangle.dot");
     //graph[0] = getGraphFromFile("graphs/generic-instances/positive-instances/Taille10_pos/instance1/G1.dot");
-    graph[1] = getGraphFromFile("graphs/generic-instances/positive-instances/Taille10_pos/instance1/G2.dot");
+    graph[0] = getGraphFromFile("graphs/generic-instances/positive-instances/Taille10_pos/instance1/G1.dot");
+    graph[1] = getGraphFromFile("graphs/generic-instances/positive-instances/Taille10_pos/instance1/G1.dot");
    // graph[0] = getGraphFromFile("graphs/generic-instances/negative-instances/Taille10_neg/instance2/G3.dot");   // longeur 0 oui
 
     printGraph(graph[1]);
@@ -29,17 +30,21 @@ int main (){
 
     */
     
-    Z3_ast f2 = graphsToFullFormula(c,graph,2);
-    int isSat2 = isFormulaSat(c,f2);
+    //Z3_ast f2 = graphsToFullFormula(c,graph,2);
+    //int isSat2 = isFormulaSat(c,f2);
+    //printf("Is sat ? : %d\n",isSat2);
+    Z3_ast f = graphsToPathFormula(c, graph,2, 6);
+    int isSat2 = isFormulaSat(c,f);
     printf("Is sat ? : %d\n",isSat2);
     
     if(isSat2 ==1){
-        Z3_model model = getModelFromSatFormula(c,f2);
-        int k = getSolutionLengthFromModel(c,model,graph);
-        printf("Longueur commune %d\n",k);
-        printPathsFromModel(c,model,graph,2,k);
+        //Z3_model model = getModelFromSatFormula(c,f2);
+        Z3_model model = getModelFromSatFormula(c,f);
+        //int k = getSolutionLengthFromModel(c,model,graph);
+        //printf("Longueur commune %d\n",2);
+        printPathsFromModel(c,model,graph,2,6);
         //Z3_del_model(c,model);
-        createDotFromModel(c,model,graph,2,2,"toto");
+        createDotFromModel(c,model,graph,2,6,"toto");
     }
     
     
