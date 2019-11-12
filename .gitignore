@@ -3,3 +3,7 @@
 
 # Ignorer tous les fichiers objet
 *.o
+
+Z3Tools.c
+
+Graph.c

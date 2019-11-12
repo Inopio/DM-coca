@@ -1,8 +1,0 @@
-digraph toto {
-_0_q8 [initial=1,color=green];
-_0_q1 [final=1,color=red];
-_0_q8 -> _0_q2 -> _0_q7 -> _0_q3 -> _0_q13 -> _0_q10 -> _0_q6 -> _0_q5 -> _0_q1;
-_1_q8 [initial=1,color=green];
-_1_q1 [final=1,color=red];
-_1_q8 -> _1_q11 -> _1_q4 -> _1_q6 -> _1_q13 -> _1_q5 -> _1_q9 -> _1_q2 -> _1_q1;
-}
