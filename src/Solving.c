@@ -235,7 +235,8 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
  * @return Z3_ast The formula.
  */
 Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs){
-    Z3_ast f;
+    Z3_ast f = Z3_mk_false(ctx);
+    Z3_ast tmp;
 
     //Pour obtenir la limite de k, majorée par le plus petit des graphes 
     int min_size;
@@ -248,9 +249,10 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
     }
     
     for(int j=0; j<min_size; j++){
-        f = graphsToPathFormula(ctx,graphs,numGraphs,j);   //longueur commune de taille j
-        if(isFormulaSat(ctx,f)==1) { //si on a une longueur commune de taille j (f satisfiable)
-           break;
+        tmp = graphsToPathFormula(ctx,graphs,numGraphs,j);   //longueur commune de taille j
+        if(isFormulaSat(ctx,tmp)==1) { //si on a une longueur commune de taille j (f satisfiable)
+            f = tmp;
+            break;
         }     
     }
     return f;
@@ -265,28 +267,18 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
  * @return int The length of a common simple accepting path in all graphs from @p graphs.
  */ 
 int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs){
-    int max = 0;
-    //Pour obtenir la limite de k, majorée par le plus petit des graphes 
-    int min_size;
-    min_size = orderG(graphs[0]);
-    for(int i =1; i < 2; i++){
-        if(min_size < orderG(graphs[i])){
-            min_size = orderG(graphs[i]);
-        }
-    }
 
-    for(int i=0; i<2; i++){
-        for(int j=0; j<min_size; j++){
-            for(int k=0; k<min_size; k++){
-                for(int q=0; q<orderG(graphs[i]); q++){
-                    if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,j,k,q)) == true){
-                        max = k;
-                    }
+    for(int k=1; k<orderG(graphs[0]); k++){
+        for(int j=0; j<orderG(graphs[0]); j++){
+            for(int q=0; q<orderG(graphs[0]); q++){
+                if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,0,j,k,q)) == true){
+                    return k;
                 }
             }
         }
     }
-    return max;
+    
+    return 0;
 }
 
 /**
@@ -299,7 +291,7 @@ int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs){
  * @param pathLength The length of path.
  */
 void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGraph, int pathLength){
-    printf("Model = %s\n",Z3_model_to_string(ctx,model));
+    //printf("Model = %s\n",Z3_model_to_string(ctx,model));
     int s,t;
     for(int i=0; i<numGraph; i++){
         printf("Path from graph %d: ",i);
