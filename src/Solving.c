@@ -243,7 +243,7 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
     
     min_size = orderG(graphs[0]);
     for(int i =0; i < numGraphs; i++){
-        if(min_size < orderG(graphs[i])){
+        if(min_size > orderG(graphs[i])){
             min_size = orderG(graphs[i]);
         }
     }
@@ -385,4 +385,3 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
     fputs("}",f);
     fclose(f);
 }
-

@@ -7,6 +7,38 @@
 #include <string.h>
 #include <assert.h>
 
+
+
+
+/**
+ * 
+ * Print if the length is a solution to the formula
+ * Based on the function graphsToFullFormula,
+ **/
+void printAllLength( Z3_context ctx, Graph *graphs,unsigned int numGraphs){
+    Z3_ast f;
+
+    //Pour obtenir la limite de k, majorée par le plus petit des graphes 
+    int max_size;
+    
+    max_size = orderG(graphs[0]);
+    for(int i =0; i < numGraphs; i++){
+        if(max_size < orderG(graphs[i])){
+            max_size = orderG(graphs[i]);
+        }
+    }
+    
+    for(int j=0; j<max_size; j++){
+        f = graphsToPathFormula(ctx,graphs,numGraphs,j);
+        if(isFormulaSat(ctx,f)==1) { 
+            printf("There is a simple valid path of length %d in all graphs\n",j);
+        }else if(isFormulaSat(ctx,f)==-1){
+            printf("No simple valid path of length %d in all graphs\n",j);
+        }     
+    }
+}
+
+
 int main (int argc, char **argv){
 
     Z3_context c = makeContext();
@@ -15,13 +47,13 @@ int main (int argc, char **argv){
     Z3_model model;
     int k; //solution length
     int isSat;
-    int size = 1;
+    int size = 2;
     char * fileName; //for the name of the file
 
     Graph graph[size];
     //graph[0] = getGraphFromFile("graphs/assignment-instance/triangle.dot");
 	graph[0] = getGraphFromFile("graphs/assignment-instance/triangle.dot");
-    //graph[1] = getGraphFromFile("graphs/generic-instances/positive-instances/Taille10_pos/instance1/G1.dot");
+    graph[1] = getGraphFromFile("graphs/generic-instances/positive-instances/Taille10_pos/instance1/G1.dot");
 
     for (int i =1; i< argc; i++){
         if(!strcmp(argv[i], "-h")){
@@ -57,13 +89,21 @@ int main (int argc, char **argv){
         }
 
       }else if (!strcmp (argv[i], "-d")){
-          if(!strcmp (argv[i-1], "-s") || !strcmp (argv[i+1], "-s")){
-            f = graphsToFullFormula(c,graph,size);
-            model = getModelFromSatFormula(c,f);
-            k = getSolutionLengthFromModel(c,model,graph);
-          }
+           for (int j =1; j< argc; j++){   // to know if "-s" if present
+                if(!strcmp (argv[j], "-s") ){
+                    f = graphsToFullFormula(c,graph,size);
+                    model = getModelFromSatFormula(c,f);
+                    k = getSolutionLengthFromModel(c,model,graph);
+                }
+           }
+           printf("Argument -s is missing !\n");
 
       }else if (!strcmp (argv[i], "-a")){
+          for (int j =1; j< argc; j++){   // to know if "-s" if present
+                if(!strcmp (argv[j], "-s") ){
+                    printAllLength(c,graph,size);
+                }
+          }
 
       }else if (!strcmp (argv[i], "-t")){
         f = graphsToFullFormula(c,graph,size);
