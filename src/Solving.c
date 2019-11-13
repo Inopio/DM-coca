@@ -294,26 +294,26 @@ void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numG
     //printf("Model = %s\n",Z3_model_to_string(ctx,model));
     int s,t;
     for(int i=0; i<numGraph; i++){
-        printf("Path from graph %d: ",i);
-
+        printf("Path from graph %d\n",i);
+        printf("%d: ",i);
         for(s=0;s<orderG(graphs[i]) && !isSource(graphs[i],s);s++); //Find the source s in the graph i
         for(t=0;t<orderG(graphs[i]) && !isTarget(graphs[i],t);t++); //Find the target t in the graph i
 
         //Source
         if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,0,pathLength,s)) == true){
-            printf("%s ",getNodeName(graphs[i],s),i,pathLength);
+            printf("pos 0: %s -> ",getNodeName(graphs[i],s),i,pathLength);
         }
         //Build the path between the source and the destination
         for(int j=1; j<pathLength; j++){
             for(int q=0; q<orderG(graphs[i]); q++){
                 if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,j,pathLength,q)) == true){
-                    printf("%s ",getNodeName(graphs[i],q));
+                    printf("pos %d: %s -> ",j,getNodeName(graphs[i],q));
                 }
             }
         }
         //Destination
         if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,t)) == true){
-              printf("%s ",getNodeName(graphs[i],t));
+              printf("pos %d: %s",pathLength,getNodeName(graphs[i],t));
         }
         printf("\n");
     }
