@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "z3.h": "c"
+        "z3.h": "c",
+        "functional": "c"
     }
 }

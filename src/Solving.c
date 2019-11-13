@@ -248,7 +248,7 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
         }
     }
     
-    for(int j=0; j<min_size; j++){
+    for(int j=0; j <= min_size; j++){
         tmp = graphsToPathFormula(ctx,graphs,numGraphs,j);   //longueur commune de taille j
         if(isFormulaSat(ctx,tmp)==1) { //si on a une longueur commune de taille j (f satisfiable)
             f = tmp;
@@ -295,25 +295,24 @@ void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numG
     int s,t;
     for(int i=0; i<numGraph; i++){
         printf("Path from graph %d\n",i);
-        printf("%d: ",i);
         for(s=0;s<orderG(graphs[i]) && !isSource(graphs[i],s);s++); //Find the source s in the graph i
         for(t=0;t<orderG(graphs[i]) && !isTarget(graphs[i],t);t++); //Find the target t in the graph i
 
         //Source
         if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,0,pathLength,s)) == true){
-            printf("pos 0: %s -> ",getNodeName(graphs[i],s),i,pathLength);
+            printf("%d: pos 0: %s -> ",i,getNodeName(graphs[i],s),i,pathLength);
         }
         //Build the path between the source and the destination
         for(int j=1; j<pathLength; j++){
             for(int q=0; q<orderG(graphs[i]); q++){
                 if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,j,pathLength,q)) == true){
-                    printf("pos %d: %s -> ",j,getNodeName(graphs[i],q));
+                    printf("%d: pos %d: %s -> ",i,j,getNodeName(graphs[i],q));
                 }
             }
         }
         //Destination
         if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,t)) == true){
-              printf("pos %d: %s",pathLength,getNodeName(graphs[i],t));
+              printf("%d: pos %d: %s",i,pathLength,getNodeName(graphs[i],t));
         }
         printf("\n");
     }
@@ -331,10 +330,12 @@ void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numG
  */
 void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGraph, int pathLength, char* name){
     char s[1024];
+    int TabSolutionPath[pathLength+1];
     int source, target;
 
     if(name == NULL){
         sprintf(s,"result-l%d.dot",pathLength);
+        name = "result";
     }else{
         sprintf(s,"%s-l%d.dot",name,pathLength);
     }
@@ -350,31 +351,47 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
 
         //Set the source --- coloration
         if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,0,pathLength,source)) == true){
+            TabSolutionPath[0] = source;
             sprintf(s,"_%d_%s ",i,getNodeName(graphs[i],source));
             fputs(s,f);
-            fputs("[initial=1,color=green];\n",f);
+            fputs("[initial=1,color=green][style=filled,fillcolor=lightblue];\n",f);
         }
         //Set the destination --- coloration
         if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,target)) == true){
+            TabSolutionPath[pathLength] = target;
             sprintf(s,"_%d_%s ",i,getNodeName(graphs[i],target));
             fputs(s,f);
-            fputs("[final=1,color=red];\n",f);
+            fputs("[final=1,color=red][style=filled,fillcolor=lightblue];\n",f);
         }
 
-        //Place at first the source at the start of the path
-        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,0,pathLength,source)) == true){
-            sprintf(s,"_%d_%s -> ",i,getNodeName(graphs[i],source));
-            fputs(s,f);
-        }
-        //Build the path between the source and the destination
         for(int j=1; j<pathLength; j++){
             for(int q=0; q<orderG(graphs[i]); q++){
                 if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,j,pathLength,q)) == true){
-                    sprintf(s,"_%d_%s -> ",i,getNodeName(graphs[i],q));
+                    TabSolutionPath[j] = q;
+                    sprintf(s,"_%d_%s [style=filled,fillcolor=lightblue];\n",i,getNodeName(graphs[i],q));
+                    fputs(s,f);
+                }else{
+                    sprintf(s,"_%d_%s;\n",i,getNodeName(graphs[i],q));
                     fputs(s,f);
                 }
             }
         }
+        for(int j = 0; j < orderG(graphs[i]); j++){
+            for(int q = 0; q < orderG(graphs[i]); q++){
+                if(isEdge(graphs[i],j,q)){
+                        sprintf(s,"_%d_%s -> _%d_%s;\n",i,
+                    getNodeName(graphs[i],j),i,getNodeName(graphs[i],q));
+                        fputs(s,f);
+                }
+            }
+        }
+
+        for(int j = 0; j<pathLength; j++){
+            sprintf(s,"_%d_%s -> _%d_%s [color=blue];\n",i,
+                getNodeName(graphs[i],TabSolutionPath[j]),i,getNodeName(graphs[i],TabSolutionPath[j+1]));
+                fputs(s,f);
+        }
+        
         //Place at last the destination at the end of the path
         if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,target)) == true){
             sprintf(s,"_%d_%s;",i,getNodeName(graphs[i],target));

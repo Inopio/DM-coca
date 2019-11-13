@@ -1,5 +1,0 @@
-digraph HƒÃH9ÝuêHƒÄ[]A\A]A^A_Ãf.„ {
-_0_s2 [initial=1,color=green];
-_0_t2 [final=1,color=red];
-_0_s2 -> _0_q -> _0_t2;
-}
