@@ -332,15 +332,13 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
     char s[1024];
     int TabSolutionPath[pathLength+1];
     int source, target;
+    bool test = false;
 
     if(name == NULL){
-        sprintf(s,"result-l%d.dot",pathLength);
         name = "result";
-    }else{
-        sprintf(s,"%s-l%d.dot",name,pathLength);
     }
+    sprintf(s,"result-l%d.dot",pathLength);
     FILE *f = fopen(s,"w+");
-
     sprintf(s,"digraph %s {\n",name);
     fputs(s, f);
 
@@ -364,6 +362,7 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
             fputs("[final=1,color=red][style=filled,fillcolor=lightblue];\n",f);
         }
 
+        //Build the .dot with all vertices, testing if they are in the path or not (color them in lightblue if they are in the path)
         for(int j=1; j<pathLength; j++){
             for(int q=0; q<orderG(graphs[i]); q++){
                 if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,j,pathLength,q)) == true){
@@ -376,22 +375,29 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
                 }
             }
         }
-        for(int j = 0; j < orderG(graphs[i]); j++){
-            for(int q = 0; q < orderG(graphs[i]); q++){
-                if(isEdge(graphs[i],j,q)){
-                        sprintf(s,"_%d_%s -> _%d_%s;\n",i,
-                    getNodeName(graphs[i],j),i,getNodeName(graphs[i],q));
-                        fputs(s,f);
-                }
-            }
-        }
 
-        for(int j = 0; j<pathLength; j++){
-            sprintf(s,"_%d_%s -> _%d_%s [color=blue];\n",i,
-                getNodeName(graphs[i],TabSolutionPath[j]),i,getNodeName(graphs[i],TabSolutionPath[j+1]));
-                fputs(s,f);
-        }
-        
+        //Build the .dot with all edges, testing if they are in the path or not (color them in blue if they are in the path)
+		for(int j = 0; j < orderG(graphs[i]); j++){
+			for(int q = 0; q < orderG(graphs[i]); q++){
+				if(isEdge(graphs[i],j,q)){
+					for(int x = 0; x<pathLength; x++){
+						if(j==TabSolutionPath[x] && q ==TabSolutionPath[x+1]){
+							test = true;
+							sprintf(s,"_%d_%s -> _%d_%s [color=blue];\n",i,
+								getNodeName(graphs[i],TabSolutionPath[x]),i,getNodeName(graphs[i],TabSolutionPath[x+1]));
+							fputs(s,f);
+						}
+					}
+					if(test == false){
+							sprintf(s,"_%d_%s -> _%d_%s;\n",i,
+						getNodeName(graphs[i],j),i,getNodeName(graphs[i],q));
+							fputs(s,f);
+					}
+					test = false;
+				}
+			}
+		}
+
         //Place at last the destination at the end of the path
         if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,target)) == true){
             sprintf(s,"_%d_%s;",i,getNodeName(graphs[i],target));
