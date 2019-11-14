@@ -22,15 +22,16 @@
 void printAllLength( Z3_context ctx, Graph *graphs,unsigned int numGraphs, bool hasOption_a, bool hasOption_d){
     Z3_ast f;
 
-    int max_size;   //limit of k
-    max_size = orderG(graphs[0]);
+    int min_size;   //limit of k
+    min_size = orderG(graphs[0]);
     for(int i =0; i < numGraphs; i++){
-        if(max_size < orderG(graphs[i])){
-            max_size = orderG(graphs[i]);
+        if(min_size > orderG(graphs[i])){
+            min_size = orderG(graphs[i]);
         }
     }
+
     if(hasOption_d == false){
-        for(int j=0; j<=max_size; j++){ //
+        for(int j=0; j<=min_size; j++){ //
             f = graphsToPathFormula(ctx,graphs,numGraphs,j);
             if(isFormulaSat(ctx,f)==1) {
                 printf("There is a simple valid path of length %d in all graphs\n",j);
@@ -42,7 +43,7 @@ void printAllLength( Z3_context ctx, Graph *graphs,unsigned int numGraphs, bool 
             }     
         }
     }else{
-        for(int j=max_size; j>=1; j--){ // "-d" option so we go backward
+        for(int j=min_size; j>=0; j--){ // "-d" option so we go backward
             f = graphsToPathFormula(ctx,graphs,numGraphs,j);
             if(isFormulaSat(ctx,f)==1) {
                 printf("There is a simple valid path of length %d in all graphs\n",j);
@@ -55,7 +56,6 @@ void printAllLength( Z3_context ctx, Graph *graphs,unsigned int numGraphs, bool 
         }
     }
 }
-
 
 int main (int argc, char **argv){
     Z3_ast f;

@@ -40,8 +40,8 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
 Z3_ast subFormulaOne( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
     Z3_ast * savephi1 = (Z3_ast*) malloc(2*sizeof(Z3_ast));
     Z3_ast * args = (Z3_ast*) malloc(2*sizeof(Z3_ast));
-    Z3_ast x1,x2, f, f1;
-    int s,t;
+    Z3_ast x1, x2, f, f1;
+    int s, t;
 
     savephi1[0] = NULL;
     for(int i = 0; i<numGraphs; i++){
@@ -62,6 +62,7 @@ Z3_ast subFormulaOne( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int 
             savephi1[0] = f1;
         }
     }
+    free(args);
     free(savephi1);
     return f1;
 }
@@ -106,6 +107,7 @@ Z3_ast subFormulaTwo( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int 
             }
         }
     }
+    free(args);
     free(savephi2);
     return f2;
 }
@@ -206,6 +208,7 @@ Z3_ast subFormulaFour( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int
         }
     }
     free(savephi4);
+    free(args);
     return f4;
 }
 
@@ -309,15 +312,15 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
         }
     }
     
-    Z3_ast f1 = subFormulaOne(ctx,graphs,numGraphs,pathLength);
-    Z3_ast f2 = subFormulaTwo(ctx,graphs,numGraphs,pathLength);
-    Z3_ast f3 = subFormulaThree(ctx,graphs,numGraphs,pathLength);
-    Z3_ast f4 = subFormulaFour(ctx,graphs,numGraphs,pathLength); 
-    Z3_ast f5 = subFormulaFive(ctx,graphs,numGraphs,pathLength);  
+    Z3_ast f1 = subFormulaOne(ctx,graphs,numGraphs,pathLength);     //Phi 1
+    Z3_ast f2 = subFormulaTwo(ctx,graphs,numGraphs,pathLength);     //Phi 2
+    Z3_ast f3 = subFormulaThree(ctx,graphs,numGraphs,pathLength);   //Phi 3
+    Z3_ast f4 = subFormulaFour(ctx,graphs,numGraphs,pathLength);    //Phi 4
+    Z3_ast f5 = subFormulaFive(ctx,graphs,numGraphs,pathLength);    //Phi 5
     
-    Z3_ast fargs[5] = {f1,f2,f3,f4,f5};
+    Z3_ast fargs[5] = {f1,f2,f3,f4,f5};                             //Phi
 
-    return  Z3_mk_and(ctx,5,fargs);;
+    return Z3_mk_and(ctx,5,fargs);
 }
 
 /**
@@ -431,8 +434,10 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
     if(name == NULL){
         name = "result";
     }
+
     sprintf(s,"%s-l%d.dot",name,pathLength);
     FILE *f = fopen(s,"w+");
+
     sprintf(s,"digraph %s {\n",name);
     fputs(s, f);
 
@@ -448,6 +453,7 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
             fputs(s,f);
             fputs("[initial=1,color=green][style=filled,fillcolor=lightblue];\n",f);
         }
+
         //Set the destination --- coloration
         if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,target)) == true){
             TabSolutionPath[pathLength] = target;
@@ -463,7 +469,8 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
                     TabSolutionPath[j] = q;
                     sprintf(s,"_%d_%s [style=filled,fillcolor=lightblue];\n",i,getNodeName(graphs[i],q));
                     fputs(s,f);
-                }else{
+                }
+                else{
                     sprintf(s,"_%d_%s;\n",i,getNodeName(graphs[i],q));
                     fputs(s,f);
                 }
