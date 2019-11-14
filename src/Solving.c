@@ -337,7 +337,7 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
     if(name == NULL){
         name = "result";
     }
-    sprintf(s,"result-l%d.dot",pathLength);
+    sprintf(s,"%s-l%d.dot",name,pathLength);
     FILE *f = fopen(s,"w+");
     sprintf(s,"digraph %s {\n",name);
     fputs(s, f);
