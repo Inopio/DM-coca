@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "Z3Tools.h"
 
 /**
@@ -434,8 +436,8 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
     if(name == NULL){
         name = "result";
     }
-
-    sprintf(s,"%s-l%d.dot",name,pathLength);
+    mkdir("sol", S_IRUSR | S_IWUSR | S_IXUSR);
+    sprintf(s,"sol/%s-l%d.dot",name,pathLength);
     FILE *f = fopen(s,"w+");
 
     sprintf(s,"digraph %s {\n",name);

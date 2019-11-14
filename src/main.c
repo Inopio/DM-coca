@@ -57,6 +57,17 @@ void printAllLength( Z3_context ctx, Graph *graphs,unsigned int numGraphs, bool 
     }
 }
 
+int isPathGraph(char * str){
+    int i =0;
+    for(int i=0; i<strlen(str)-5; i++); //to examine the last 4 char, ".dot" extension
+    if(!strcmp(str+(strlen(str) - i), ".dot"))
+        printf("str %s\n",str); 
+        return true;
+    
+    return false;
+}
+
+
 int main (int argc, char **argv){
     Z3_ast f;
     Z3_model model;
@@ -76,7 +87,7 @@ int main (int argc, char **argv){
 
     //Initialisation of graphs 
     for(int i = 1; i < argc; i++){
-        if(!strncmp(argv[i], "graphs/", 7)){    //comparison between t
+        if(isPathGraph(argv[i])){    //comparison between t
             graph[nbGraphs] = getGraphFromFile(argv[i]);
             nbGraphs++;
         }
