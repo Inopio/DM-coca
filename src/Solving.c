@@ -5,8 +5,16 @@
 #include <stdlib.h>
 #include "Z3Tools.h"
 
-#define min(a,b) (a<=b?a:b)
-
+/**
+ * @brief Generates a formula consisting of a variable representing the fact that @p node of graph number @p number is at position @p position of an accepting path.
+ * 
+ * @param ctx The solver context.
+ * @param number The number of the graph.
+ * @param position The position in the path.
+ * @param k The mysterious k from the subject of this assignment.
+ * @param node The node identifier.
+ * @return Z3_ast The formula.
+ */
 Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node){
     Z3_ast x;
     
@@ -19,25 +27,22 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
     return x;
 }
 
-Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
-
-    if(pathLength == 0){ // Non satisfiable pour le moment
-        return Z3_mk_false(ctx);
-    }
-
-    for(int i=0; i<numGraphs; i++){
-        if(sizeG(graphs[i]) <= pathLength || orderG(graphs[i]) <= pathLength){
-            return Z3_mk_false(ctx);
-        }
-    }
-    int s,t;                            //indices des sommets s et t du graphe
-    Z3_ast x1,x2;                       //variables construction des clauses
-    Z3_ast negX1,negX2;                 //négation des variables
-    Z3_ast f, f1, f2, f3, f4, f5, tmp;  //variables stockage des formules
-    Z3_ast args[2];                     //tableaux de construction des formules
-
-   //Phi 1
+//Phi 1
+/**
+ * @brief Generates a SAT subformula satisfiable.
+ * 
+ * @param ctx The solver context.
+ * @param graphs An array of graphs.
+ * @param numGraphs The number of graphs in @p graphs.
+ * @param pathLength The length of the path to check.
+ * @return Z3_ast The formula.
+ */
+Z3_ast subFormulaOne( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
     Z3_ast * savephi1 = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    Z3_ast * args = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    Z3_ast x1,x2, f, f1;
+    int s,t;
+
     savephi1[0] = NULL;
     for(int i = 0; i<numGraphs; i++){
         for(s=0;s<orderG(graphs[i]) && !isSource(graphs[i],s);s++);
@@ -58,10 +63,25 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
         }
     }
     free(savephi1);
-    
-    //Phi 2
+    return f1;
+}
+
+//Phi 2
+/**
+ * @brief Generates a SAT subformula satisfiable.
+ * 
+ * @param ctx The solver context.
+ * @param graphs An array of graphs.
+ * @param numGraphs The number of graphs in @p graphs.
+ * @param pathLength The length of the path to check.
+ * @return Z3_ast The formula.
+ */
+Z3_ast subFormulaTwo( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
     Z3_ast * savephi2 = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    Z3_ast * args = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    Z3_ast f2, tmp, x1, x2;
     savephi2[0] = NULL;
+
     for(int i=0; i<numGraphs; i++){
         for(int j=0; j<=pathLength; j++){
             for(int q =0; q<orderG(graphs[i]); q++){
@@ -87,13 +107,28 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
         }
     }
     free(savephi2);
+    return f2;
+}
 
-    //Phi 3
+//Phi 3
+/**
+ * @brief Generates a SAT subformula satisfiable.
+ * 
+ * @param ctx The solver context.
+ * @param graphs An array of graphs.
+ * @param numGraphs The number of graphs in @p graphs.
+ * @param pathLength The length of the path to check.
+ * @return Z3_ast The formula.
+ */
+Z3_ast subFormulaThree( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
     Z3_ast * savephi3_or = (Z3_ast*) malloc(2*sizeof(Z3_ast));
     savephi3_or[0] = NULL;
     Z3_ast * savephi3_and = (Z3_ast*) malloc(2*sizeof(Z3_ast));
     savephi3_and[0] = NULL;
-   for(int i = 0; i < numGraphs; i++){
+
+    Z3_ast f3, x1, x2;
+
+    for(int i = 0; i < numGraphs; i++){
        for(int j = 0; j <= pathLength; j++){
            Z3_ast f3_or;
            for(int q = 0; q < orderG(graphs[i]); q++){
@@ -101,7 +136,8 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
                if(savephi3_or[0]==NULL){
                    f3_or = x1;
                    savephi3_or[0] = f3_or;
-               }else{
+               }
+               else{
                    savephi3_or[1] = x1;
                    f3_or = Z3_mk_or(ctx, 2, savephi3_or);
                    savephi3_or[0] = f3_or;
@@ -112,7 +148,8 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
             if(savephi3_and[0] == NULL){
                 savephi3_and[0] = f3_or;
                 f3 = f3_or;
-            }else{
+            }
+            else{
                 savephi3_and[1] = f3_or;
                 f3 = Z3_mk_and(ctx, 2, savephi3_and);
                 savephi3_and[0] = f3;
@@ -121,10 +158,30 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
    }
    free(savephi3_or);
    free(savephi3_and);
+   return f3;
+}
 
-    //Phi 4
+
+//Phi 4
+/**
+ * @brief Generates a SAT subformula satisfiable.
+ * 
+ * @param ctx The solver context.
+ * @param graphs An array of graphs.
+ * @param numGraphs The number of graphs in @p graphs.
+ * @param pathLength The length of the path to check.
+ * @return Z3_ast The formula.
+ */
+Z3_ast subFormulaFour( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
+    
     Z3_ast * savephi4 = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    Z3_ast * args = (Z3_ast*) malloc(2*sizeof(Z3_ast));
     savephi4[0] = NULL;
+
+    Z3_ast f4,tmp;
+    Z3_ast x1, x2;
+    int s,t;
+
     for(int i = 0; i < numGraphs; i++){
         for(int q = 0; q < orderG(graphs[i]); q++){
             for(int j = 0; j <= pathLength; j++){
@@ -149,81 +206,118 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
         }
     }
     free(savephi4);
+    return f4;
+}
 
-    //Phi 5
+//Phi 5
+/**
+ * @brief Generates a SAT subformula satisfiable.
+ * 
+ * @param ctx The solver context.
+ * @param graphs An array of graphs.
+ * @param numGraphs The number of graphs in @p graphs.
+ * @param pathLength The length of the path to check.
+ * @return Z3_ast The formula.
+ */
+Z3_ast subFormulaFive( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
+    Z3_ast f5, x1, x2, tmp;
+    int s,t;
     Z3_ast * args1 = (Z3_ast*) malloc(2*sizeof(Z3_ast));
     Z3_ast * savephi5_or = (Z3_ast*) malloc(2*sizeof(Z3_ast));
     Z3_ast * savephi5_and = (Z3_ast*) malloc(2*sizeof(Z3_ast));
     savephi5_or[0] = NULL;
     savephi5_and[0] = NULL;
-        for(int i=0; i<numGraphs; i++){
-            for(s=0;s<orderG(graphs[i]) && !isSource(graphs[i],s);s++);
-            for(t=0;t<orderG(graphs[i]) && !isTarget(graphs[i],t);t++);
-            x1 = getNodeVariable(ctx, i, 0, pathLength, s);
-            x2 = getNodeVariable(ctx, i, pathLength, pathLength, t);
-            if(pathLength > 1){
-                for(int j=0; j<pathLength; j++){
-                    Z3_ast f5_or;
-                    for(int q =0; q<orderG(graphs[i]); q++){
-                        for(int r =0; r<orderG(graphs[i]); r++){
-                            if(isEdge(graphs[i],q,r)){
-                                args1[0] = getNodeVariable(ctx, i, j, pathLength, q);
-                                args1[1] = getNodeVariable(ctx, i, j+1, pathLength, r);
-                                tmp = Z3_mk_and(ctx, 2, args1);
-                                if(savephi5_or[0] == NULL){
-                                    f5_or = tmp;
-                                    savephi5_or[0] = f5_or;
-                                }else{
-                                    savephi5_or[1] = tmp;
-                                    f5_or = Z3_mk_or(ctx, 2, savephi5_or);
-                                    savephi5_or[0] = f5_or;
-                                }
+
+    for(int i=0; i<numGraphs; i++){
+        for(s=0;s<orderG(graphs[i]) && !isSource(graphs[i],s);s++);
+        for(t=0;t<orderG(graphs[i]) && !isTarget(graphs[i],t);t++);
+        x1 = getNodeVariable(ctx, i, 0, pathLength, s);
+        x2 = getNodeVariable(ctx, i, pathLength, pathLength, t);
+        if(pathLength > 1){
+            for(int j=0; j<pathLength; j++){
+                Z3_ast f5_or;
+                for(int q =0; q<orderG(graphs[i]); q++){
+                    for(int r =0; r<orderG(graphs[i]); r++){
+                        if(isEdge(graphs[i],q,r)){
+                            args1[0] = getNodeVariable(ctx, i, j, pathLength, q);
+                            args1[1] = getNodeVariable(ctx, i, j+1, pathLength, r);
+                            tmp = Z3_mk_and(ctx, 2, args1);
+                            if(savephi5_or[0] == NULL){
+                                f5_or = tmp;
+                                savephi5_or[0] = f5_or;
+                            }else{
+                                savephi5_or[1] = tmp;
+                                f5_or = Z3_mk_or(ctx, 2, savephi5_or);
+                                savephi5_or[0] = f5_or;
                             }
                         }
                     }
-                    savephi5_or[0] = NULL;
-                    savephi5_or[1] = NULL;
-                    if(savephi5_and[0] == NULL){
-                        savephi5_and[0] = f5_or;
-                        f5 = f5_or;
-                    }else{
-                        savephi5_and[1] = f5_or;
-                        f5 = Z3_mk_and(ctx, 2, savephi5_and);
-                        savephi5_and[0] = f5;
-                    }
                 }
-            }else{
-                if(isEdge(graphs[i],s,t)){
-                    x1 = getNodeVariable(ctx, i, 0, pathLength, s);
-                    x2 = getNodeVariable(ctx, i, pathLength, pathLength, t);
-                    tmp = Z3_mk_and(ctx, 2, args1);
-                    if(savephi5_and[0] == NULL){
-                            f5 = tmp;
-                            savephi5_and[0] = tmp;
-                    }else{
-                            savephi5_and[0] = tmp;
-                            f5=Z3_mk_and(ctx, 2, savephi5_and);
-                            savephi5_and[1] = f5;
-                    }
+                savephi5_or[0] = NULL;
+                savephi5_or[1] = NULL;
+                if(savephi5_and[0] == NULL){
+                    savephi5_and[0] = f5_or;
+                    f5 = f5_or;
                 }else{
-                    return Z3_mk_false(ctx);
+                    savephi5_and[1] = f5_or;
+                    f5 = Z3_mk_and(ctx, 2, savephi5_and);
+                    savephi5_and[0] = f5;
                 }
             }
+        }else{
+            if(isEdge(graphs[i],s,t)){
+                x1 = getNodeVariable(ctx, i, 0, pathLength, s);
+                x2 = getNodeVariable(ctx, i, pathLength, pathLength, t);
+                tmp = Z3_mk_and(ctx, 2, args1);
+                if(savephi5_and[0] == NULL){
+                        f5 = tmp;
+                        savephi5_and[0] = tmp;
+                }else{
+                        savephi5_and[0] = tmp;
+                        f5=Z3_mk_and(ctx, 2, savephi5_and);
+                        savephi5_and[1] = f5;
+                }
+            }else{
+                return Z3_mk_false(ctx);
+            }
         }
-        free(args1);
-        free(savephi5_or);
-        free(savephi5_and);
+    }
+    free(args1);
+    free(savephi5_or);
+    free(savephi5_and);
+    return f5;
+}
 
-    Z3_ast fargs[5];
+/**
+ * @brief Generates a SAT formula satisfiable if and only if all graphs of @p graphs contain an accepting path of length @p pathLength.
+ * 
+ * @param ctx The solver context.
+ * @param graphs An array of graphs.
+ * @param numGraphs The number of graphs in @p graphs.
+ * @param pathLength The length of the path to check.
+ * @return Z3_ast The formula.
+ */
+Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
 
-    fargs[0] = f1;
-    fargs[1] = f2;
-    fargs[2] = f3;
-    fargs[3] = f4;
-    fargs[4] = f5;
+    if(pathLength == 0){ // Non satisfiable
+        return Z3_mk_false(ctx);
+    }
+
+    for(int i=0; i<numGraphs; i++){
+        if(sizeG(graphs[i]) <= pathLength || orderG(graphs[i]) <= pathLength){
+            return Z3_mk_false(ctx);
+        }
+    }
     
-    f = Z3_mk_and(ctx,5,fargs);
-    return  f;
+    Z3_ast f1 = subFormulaOne(ctx,graphs,numGraphs,pathLength);
+    Z3_ast f2 = subFormulaTwo(ctx,graphs,numGraphs,pathLength);
+    Z3_ast f3 = subFormulaThree(ctx,graphs,numGraphs,pathLength);
+    Z3_ast f4 = subFormulaFour(ctx,graphs,numGraphs,pathLength); 
+    Z3_ast f5 = subFormulaFive(ctx,graphs,numGraphs,pathLength);  
+    
+    Z3_ast fargs[5] = {f1,f2,f3,f4,f5};
+
+    return  Z3_mk_and(ctx,5,fargs);;
 }
 
 /**

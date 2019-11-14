@@ -9,16 +9,20 @@
 #include <stdlib.h>
 
 
+
 /**
+ * @brief Print if the length is a solution to the formula. Based on the function graphsToFullFormula.
  * 
- * Print if the length is a solution to the formula
- * Based on the function graphsToFullFormula,
- **/
+ * @param ctx The solver context.
+ * @param graphs An array of graphs.
+ * @param numGraphs The number of graphs in @p graphs.
+ * @param hasOption_a Boolean to know if option -a is given.
+ * @param hasOption_d Boolean to know if option -d is given.
+ */
 void printAllLength( Z3_context ctx, Graph *graphs,unsigned int numGraphs, bool hasOption_a, bool hasOption_d){
     Z3_ast f;
 
-    //Pour obtenir la limite de k, majorée par le plus petit des graphes 
-    int max_size;
+    int max_size;   //limit of k
     max_size = orderG(graphs[0]);
     for(int i =0; i < numGraphs; i++){
         if(max_size < orderG(graphs[i])){
@@ -26,11 +30,11 @@ void printAllLength( Z3_context ctx, Graph *graphs,unsigned int numGraphs, bool 
         }
     }
     if(hasOption_d == false){
-        for(int j=0; j<=max_size; j++){
+        for(int j=0; j<=max_size; j++){ //
             f = graphsToPathFormula(ctx,graphs,numGraphs,j);
             if(isFormulaSat(ctx,f)==1) {
                 printf("There is a simple valid path of length %d in all graphs\n",j);
-                if(hasOption_a == false){
+                if(hasOption_a == false){   // no "-a" means we stop at the first solution
                     break;
                 }
             }else if(isFormulaSat(ctx,f)==-1){
@@ -38,11 +42,11 @@ void printAllLength( Z3_context ctx, Graph *graphs,unsigned int numGraphs, bool 
             }     
         }
     }else{
-        for(int j=max_size; j>=1; j--){
+        for(int j=max_size; j>=1; j--){ // "-d" option so we go backward
             f = graphsToPathFormula(ctx,graphs,numGraphs,j);
             if(isFormulaSat(ctx,f)==1) {
                 printf("There is a simple valid path of length %d in all graphs\n",j);
-                if(hasOption_a == false){
+                if(hasOption_a == false){    // no "-a" means we stop at the first solution
                     break;
                 }
             }else if(isFormulaSat(ctx,f)==-1){
@@ -95,27 +99,30 @@ int main (int argc, char **argv){
         
         else if (!strcmp (argv[i], "-v" ) && argc > 2){
             for(int j =0; j<nbGraphs; j++){
-                printGraph(graph[j]);
+                printGraph(graph[j]);       //display parsed graphs
             }
         }
       
         else if (!strcmp (argv[i], "-F")){
-            f = graphsToFullFormula(c,graph,nbGraphs);
-            printf("Path formula: %s\n",Z3_ast_to_string(c,f));
+            f = graphsToFullFormula(c,graph,nbGraphs);  
+            printf("Path formula: %s\n",Z3_ast_to_string(c,f)); //display the formula 
         }
         
         else if (!strcmp (argv[i], "-s")){
             hasOption_s = true;
             for (int j = 1; j < argc; j++){
                 if(!strcmp (argv[j], "-a") ){
-                    hasOption_a = true;
+                    hasOption_a = true;         //set option
                 }
                 if(!strcmp (argv[j], "-d")){
-                    hasOption_d = true;
+                    hasOption_d = true;         //set option
                 }
             }
-            if(hasOption_a == true && hasOption_d == true){
-                printAllLength(c,graph,nbGraphs,true,true);
+            /**
+            *  boolean case options to avoid duplication of printing
+            **/
+            if(hasOption_a == true && hasOption_d == true){ 
+                printAllLength(c,graph,nbGraphs,true,true); 
             }
             else if(hasOption_a == true && hasOption_d == false){
                 printAllLength(c,graph,nbGraphs,true,false);
@@ -132,7 +139,7 @@ int main (int argc, char **argv){
             f = graphsToFullFormula(c,graph,nbGraphs);
             model = getModelFromSatFormula(c,f);
             k = getSolutionLengthFromModel(c,model,graph);
-            printPathsFromModel(c,model,graph,nbGraphs,k);
+            printPathsFromModel(c,model,graph,nbGraphs,k);  //display the path
         }
 
         else if (!strcmp (argv[i], "-f")){
@@ -143,8 +150,8 @@ int main (int argc, char **argv){
             model = getModelFromSatFormula(c,f);
             k = getSolutionLengthFromModel(c,model,graph);
             if(fileName == NULL)
-                createDotFromModel(c,model,graph,nbGraphs,k,NULL);
-            createDotFromModel(c,model,graph,nbGraphs,k,fileName);
+                createDotFromModel(c,model,graph,nbGraphs,k,NULL);  //create the file with NULL name
+            createDotFromModel(c,model,graph,nbGraphs,k,fileName);  //create the file using the name
         }
     }
 
@@ -154,7 +161,7 @@ int main (int argc, char **argv){
         isSat = isFormulaSat(c,f);
         if(isSat == 1){
             model = getModelFromSatFormula(c,f);
-            k = getSolutionLengthFromModel(c,model,graph);
+            k = getSolutionLengthFromModel(c,model,graph);      //get all solutions
             printf("There is a simple valid path of length %d in all graphs\n",k);
         }else{
             printf("No simple valid path of equal length in all graphs\n");
