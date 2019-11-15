@@ -112,7 +112,7 @@ int main (int argc, char **argv){
             printf ("-h         Displays this help\n");
             printf ("-v         Activate verbose mode (displays parsed graphs\n");
             printf ("-F         Displays the formula computed\n");
-            printf ("-s         Tests separately all formula by depth [if not present: uses the global formula]\n");
+            printf ("-s         Tests separately all formula by depth\n");
             printf ("-d         Only if -s is present. Explore the length in decreasing order. [if not present: in increasing order]\n");
             printf ("-a         Only if -s is present. Computes a result for every length instead of stopping at the first positive result (default behaviour)\n");
             printf ("-t         Displays the paths found on the terminal [if not present, only displays the existence of the path].\n");
