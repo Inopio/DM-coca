@@ -109,7 +109,7 @@ int main (int argc, char **argv){
             printf ("-a         Only if -s is present. Computes a result for every length instead of stopping at the first positive result (default behaviour)\n");
             printf ("-t         Displays the paths found on the terminal [if not present, only displays the existence of the path].\n");
             printf ("-f         Writes the result with colors in a .dot file. See next option for the name. These files will be produced in the folder 'sol'.\n");
-            printf ("-o NAME    Writes the output in 'NAME-lLENGTH.dot' where LENGTH is the length of the solution. Writes several files in this format if both -s and -a are present. [if not present: 'result-lLENGTH.dot']\n");
+            printf ("-o NAME    Writes the output in 'NAME-lLENGTH.dot' where LENGTH is the length of the solution. [if not present: 'result-lLENGTH.dot']\n");
     
         }
         
