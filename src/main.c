@@ -57,16 +57,21 @@ void printAllLength( Z3_context ctx, Graph *graphs,unsigned int numGraphs, bool 
     }
 }
 
-int isPathGraph(char * str){
-    int i =0;
-    for(int i=0; i<strlen(str)-5; i++); //to examine the last 4 char, ".dot" extension
-    if(!strcmp(str+(strlen(str) - i), ".dot"))
-        printf("str %s\n",str); 
+bool isPathGraph(char * str){
+    if(strlen(str)-5 < 0){
+		return false;
+	}
+    char * tab = (char*) malloc(4*sizeof(char));
+    int indextab = 0;
+    for(int i = strlen(str)-4; i <= strlen(str); i++){ //to examine the last 4 char, ".dot" extension
+		tab[indextab] = str[i];
+        indextab++;
+	}
+    if(!strcmp(tab, ".dot")){
         return true;
-    
+    }
     return false;
 }
-
 
 int main (int argc, char **argv){
     Z3_ast f;
