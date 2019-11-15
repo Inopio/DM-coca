@@ -506,7 +506,7 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
 					}
 					IsEdgePath = false;
 				}
-			}
+			} 
 		}
         fputs("\n",f);
     }
