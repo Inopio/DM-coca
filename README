@@ -4,11 +4,9 @@ ___________________________
 
 - Lancer le programme avec ./equalpath 
 et un chemin relatif de graph (fichier .dot seulement)
-- Sans option le programme donne une solution au problème en en utilisant la fonction sat retournée par getModelFromSatFormula.
+- Sans option le programme donne une solution au problème en utilisant la fonction sat retournée par getModelFromSatFormula.
 
 Différentes options mises en places : 
-
-Options:
 -h         Displays this help
 -v         Activate verbose mode (displays parsed graphs
 -F         Displays the formula computed
@@ -18,3 +16,4 @@ Options:
 -t         Displays the paths found on the terminal [if not present, only displays the existence of the path].
 -f         Writes the result with colors in a .dot file. See next option for the name. These files will be produced in the folder 'sol'.
 -o NAME    Writes the output in 'NAME-lLENGTH.dot' where LENGTH is the length of the solution. [if not present: 'result-lLENGTH.dot']
+(Attention à bien écrire le nom du fichier après le -o car l'argument n'est pas reconnu à une autre position.)
