@@ -337,7 +337,7 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
     Z3_ast f = Z3_mk_false(ctx);
     Z3_ast tmp;
 
-    //Pour obtenir la limite de k, majorée par le plus petit des graphes 
+    //Based on every graph, min_size is the number of vertices of the smallest graph
     int min_size;
     
     min_size = orderG(graphs[0]);
@@ -347,9 +347,11 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
         }
     }
     
+    //For every pathLength j, we call graphsToPathFormula with this pathLength and
+    //we verify if this is a SAT Formula which can be satisfied
     for(int j=0; j <= min_size; j++){
-        tmp = graphsToPathFormula(ctx,graphs,numGraphs,j);   //longueur commune de taille j
-        if(isFormulaSat(ctx,tmp)==1) { //si on a une longueur commune de taille j (f satisfiable)
+        tmp = graphsToPathFormula(ctx,graphs,numGraphs,j);   //common path of length j
+        if(isFormulaSat(ctx,tmp)==1) { //if we have a common path of length j, f can be satisfied
             f = tmp;
             break;
         }     
@@ -367,6 +369,7 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
  */ 
 int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs){
 
+    //Checking every variable in the model to get k, the common path in all graphs
     for(int k=1; k<orderG(graphs[0]); k++){
         for(int j=0; j<orderG(graphs[0]); j++){
             for(int q=0; q<orderG(graphs[0]); q++){
@@ -390,7 +393,6 @@ int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs){
  * @param pathLength The length of path.
  */
 void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGraph, int pathLength){
-    //printf("Model = %s\n",Z3_model_to_string(ctx,model));
     int s,t;
     for(int i=0; i<numGraph; i++){
         printf("Path from graph %d\n",i);
@@ -401,6 +403,7 @@ void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numG
         if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,0,pathLength,s)) == true){
             printf("%d: pos 0: %s -> ",i,getNodeName(graphs[i],s),i,pathLength);
         }
+
         //Build the path between the source and the destination
         for(int j=1; j<pathLength; j++){
             for(int q=0; q<orderG(graphs[i]); q++){
@@ -409,6 +412,7 @@ void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numG
                 }
             }
         }
+
         //Destination
         if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,t)) == true){
               printf("%d: pos %d: %s",i,pathLength,getNodeName(graphs[i],t));
@@ -428,14 +432,16 @@ void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numG
  * @param name The name of the output file.
  */
 void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGraph, int pathLength, char* name){
-    char s[1024];
-    int TabSolutionPath[pathLength+1];
+    char s[1024];                       //Buffer to store our strings with sprintf and so we can fputs them in the file
+    int TabSolutionPath[pathLength+1];  //Tab of every vertice in the path
     int source, target;
-    bool test = false;
+    bool IsEdgePath = false;
 
     if(name == NULL){
         name = "result";
     }
+
+    //Create the folder sol, where there are every .dot generetated
     mkdir("sol", S_IRUSR | S_IWUSR | S_IXUSR);
     sprintf(s,"sol/%s-l%d.dot",name,pathLength);
     FILE *f = fopen(s,"w+");
@@ -483,29 +489,25 @@ void createDotFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGr
 		for(int j = 0; j < orderG(graphs[i]); j++){
 			for(int q = 0; q < orderG(graphs[i]); q++){
 				if(isEdge(graphs[i],j,q)){
+                    //Checking if j and q are both vertices in TabSolutionPath, if yes, they form an edge in the path
 					for(int x = 0; x<pathLength; x++){
 						if(j==TabSolutionPath[x] && q ==TabSolutionPath[x+1]){
-							test = true;
+							IsEdgePath = true;
 							sprintf(s,"_%d_%s -> _%d_%s [color=blue];\n",i,
 								getNodeName(graphs[i],TabSolutionPath[x]),i,getNodeName(graphs[i],TabSolutionPath[x+1]));
 							fputs(s,f);
 						}
 					}
-					if(test == false){
+                    //If j and q are not both in TabSolutionPath, the edge is not in the path
+					if(IsEdgePath == false){
 							sprintf(s,"_%d_%s -> _%d_%s;\n",i,
 						getNodeName(graphs[i],j),i,getNodeName(graphs[i],q));
 							fputs(s,f);
 					}
-					test = false;
+					IsEdgePath = false;
 				}
 			}
 		}
-
-        //Place at last the destination at the end of the path
-        if(valueOfVarInModel(ctx,model,getNodeVariable(ctx,i,pathLength,pathLength,target)) == true){
-            sprintf(s,"_%d_%s;",i,getNodeName(graphs[i],target));
-            fputs(s,f);
-        }
         fputs("\n",f);
     }
     fputs("}",f);
