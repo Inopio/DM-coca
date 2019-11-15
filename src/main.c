@@ -58,7 +58,7 @@ void printAllLength( Z3_context ctx, Graph *graphs,unsigned int numGraphs, bool 
 }
 
 bool isPathGraph(char * str){
-    if(strlen(str)-5 < 0){
+    if(strlen(str)-4 < 0){
 		return false;
 	}
     char * tab = (char*) malloc(4*sizeof(char));

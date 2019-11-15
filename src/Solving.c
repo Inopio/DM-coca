@@ -309,7 +309,7 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
     }
 
     for(int i=0; i<numGraphs; i++){
-        if(sizeG(graphs[i]) <= pathLength || orderG(graphs[i]) <= pathLength){
+        if(sizeG(graphs[i]) < pathLength || orderG(graphs[i]) <= pathLength){
             return Z3_mk_false(ctx);
         }
     }
