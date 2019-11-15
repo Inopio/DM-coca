@@ -57,6 +57,12 @@ void printAllLength(Z3_context ctx, Graph *graphs,unsigned int numGraphs, bool h
     }
 }
 
+/**
+ * @brief Tells if a string correspond to a relativ path of a .dot file.
+ * 
+ * @param str the string to be evaluated.
+ * @return bool.
+ */
 bool isPathGraph(char * str){
     if(strlen(str)-4 < 0){
 		return false;
