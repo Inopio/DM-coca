@@ -19,7 +19,7 @@
  * @param hasOption_a Boolean to know if option -a is given.
  * @param hasOption_d Boolean to know if option -d is given.
  */
-void printAllLength( Z3_context ctx, Graph *graphs,unsigned int numGraphs, bool hasOption_a, bool hasOption_d){
+void printAllLength(Z3_context ctx, Graph *graphs,unsigned int numGraphs, bool hasOption_a, bool hasOption_d){
     Z3_ast f;
 
     int min_size;   //limit of k
@@ -62,6 +62,7 @@ bool isPathGraph(char * str){
 		return false;
 	}
     char * tab = (char*) malloc(4*sizeof(char));
+    assert(tab);
     int indextab = 0;
     for(int i = strlen(str)-4; i <= strlen(str); i++){ //to examine the last 4 char, ".dot" extension
 		tab[indextab] = str[i];
@@ -70,6 +71,7 @@ bool isPathGraph(char * str){
     if(!strcmp(tab, ".dot")){
         return true;
     }
+    free(tab);
     return false;
 }
 

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <assert.h>
 #include "Z3Tools.h"
 
 /**
@@ -41,7 +42,9 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
  */
 Z3_ast subFormulaOne( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
     Z3_ast * savephi1 = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    assert(savephi1);
     Z3_ast * args = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    assert(args);
     Z3_ast x1, x2, f, f1;
     int s, t;
 
@@ -81,7 +84,9 @@ Z3_ast subFormulaOne( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int 
  */
 Z3_ast subFormulaTwo( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
     Z3_ast * savephi2 = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    assert(savephi2);
     Z3_ast * args = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    assert(args);
     Z3_ast f2, tmp, x1, x2;
     savephi2[0] = NULL;
 
@@ -126,8 +131,10 @@ Z3_ast subFormulaTwo( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int 
  */
 Z3_ast subFormulaThree( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
     Z3_ast * savephi3_or = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    assert(savephi3_or);
     savephi3_or[0] = NULL;
     Z3_ast * savephi3_and = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    assert(savephi3_and);
     savephi3_and[0] = NULL;
 
     Z3_ast f3, x1, x2;
@@ -179,7 +186,9 @@ Z3_ast subFormulaThree( Z3_context ctx, Graph *graphs,unsigned int numGraphs, in
 Z3_ast subFormulaFour( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
     
     Z3_ast * savephi4 = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    assert(savephi4);
     Z3_ast * args = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    assert(args);
     savephi4[0] = NULL;
 
     Z3_ast f4,tmp;
@@ -228,8 +237,11 @@ Z3_ast subFormulaFive( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int
     Z3_ast f5, x1, x2, tmp;
     int s,t;
     Z3_ast * args1 = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    assert(args1);
     Z3_ast * savephi5_or = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    assert(savephi5_or);
     Z3_ast * savephi5_and = (Z3_ast*) malloc(2*sizeof(Z3_ast));
+    assert(savephi5_and);
     savephi5_or[0] = NULL;
     savephi5_and[0] = NULL;
 
